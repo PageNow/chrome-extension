@@ -1,0 +1,24 @@
+{
+    "name": "PageNow",
+    "version": "1.0",
+    "manifest_version": 2,
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "content_security_policy": "script-src 'self' 'sha256-QIjzuIZb7Jf1IBng50cTXWl/u1z2oEXn8eRipyunv9s=' 'sha256-GKErAnu8hP85hkSIiHK2qc1yRwHWIovvitbcPLPoxDw=' 'sha256-A4NZUtnvoQ9cFpR38AhtYGy29iXOVuvIK8zMLffV3pk=' 'sha256-plV8bfrNysGdYGN+s7qdSr0NfoBNT8ipWpFjjs6GBHw='; object-src 'self'",
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "permissions": [
+        "storage",
+        "tabs",
+        "activeTab"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["./content_static/static/js/main.js", "/content_static/static/js/1.chunk.js"],
+            "css": ["./content_static/static/css/main.css"]
+        }
+    ]
+}

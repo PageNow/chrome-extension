@@ -1,0 +1,33 @@
+.chatbox-iframe-div {
+    background-color: azure;
+}
+
+.chatbox-iframe-rnd {
+    position: fixed !important;
+	/* left: 0; */
+	bottom: 0;
+	top: unset !important;
+	z-index: 2147483646;
+	/* one less than image modal */
+	display: none;
+	/* border: 1px solid lightgray; */
+	border-bottom: none;
+	/* border-right: none; */
+	/* box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.31); */
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.chatbox-iframe {
+    /* don't remove anything, this is fighting other sites' styling*/
+    min-height: 0px;
+    min-width: 0px;
+    height: 100%;
+    width: 100%;
+    max-width: 9999px;
+    max-height: 9999px;
+    border: none;
+    /* put display: none here, but still need to set it in js
+    so that we can read it easily later
+    */
+    margin-bottom: 0px;
+}
