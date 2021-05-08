@@ -16,13 +16,15 @@ class App extends React.Component {
             chrome.storage.local.get(windowChatboxOpenKey, item => {
                 this.setState({
                     chatboxToggledOn: item[windowChatboxOpenKey]
-                })
+                });
             });
 
             chrome.storage.onChanged.addListener((changes, namespace) => {
-                this.setState({
-                    chatboxToggledOn: changes[windowChatboxOpenKey].newValue
-                });
+                if (windowChatboxOpenKey in changes) {
+                    this.setState({
+                        chatboxToggledOn: changes[windowChatboxOpenKey].newValue
+                    });
+                }
             });
         });
     }

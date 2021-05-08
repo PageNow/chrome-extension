@@ -37,7 +37,6 @@ function ChatIcon () {
             updatedItem[windowChatboxOpenKey] = !item[windowChatboxOpenKey];
             chrome.storage.local.set(updatedItem);
         });
-        window.testVariable++;
     }
 
     return (

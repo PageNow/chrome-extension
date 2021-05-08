@@ -37,7 +37,6 @@ function ChatboxIframe() {
                  minWidth="300" minHeight="400"
                  default={{x: 0, y: 0, width: 300, height: 400}}
                  dragAxis="x">
-                {window.testVariable}
                 <iframe
                     allow="autoplay"
                     allowFullScreen={true}
@@ -46,7 +45,7 @@ function ChatboxIframe() {
                     title="Chatbox"
                     ref={iframeRef}
                     className="chatbox-iframe"
-                    src="http://localhost:3000"
+                    src="http://localhost:4200"
                 />     
             </Rnd>
         </div>
