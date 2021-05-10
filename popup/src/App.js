@@ -1,5 +1,4 @@
 /*global chrome*/
-
 import React from 'react';
 
 import './App.css';
@@ -7,6 +6,10 @@ import './App.css';
 class App extends React.Component {
     // state refreshes every time you open the popup
     state = {
+        user: null,
+        email: '',
+        password: '',
+        customState: null,
         chatboxToggledOn: false,
     }
 
@@ -46,14 +49,24 @@ class App extends React.Component {
     render() {
         return (
             <div className="App">
-                <div>Practice</div>
+                <div>
+                    <a href="http://localhost:4200/auth" target="_blank" rel="noopener noreferrer">
+                        Click to Sign into PageNow
+                    </a>
+                </div>
+                <div>Logged In as {this.state.user}</div>
                 <div>Chatbox display: {this.state.chatboxToggledOn}</div>
                 <button onClick={this.toggleChatbox}>
                     {this.state.chatboxToggledOn ? "Close Chatbox" : "Open Chatbox"}
                 </button>
+                
             </div>
         );
     }
 }
 
 export default App;
+
+/* References
+ * https://stackoverflow.com/questions/44968953/how-to-create-a-login-using-google-in-chrome-extension
+ */
