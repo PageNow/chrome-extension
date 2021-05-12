@@ -76,3 +76,6 @@ chrome.windows.onCreated.addListener(function(windowId) {
         });
     });
 });
+
+
+// TODO: set everything to false when disconnect?
