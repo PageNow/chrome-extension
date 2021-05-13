@@ -5,11 +5,13 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
 import styles from './SignIn.module.css';
+import authStyles from '../../shared/Auth.module.css';
+import GoogleLogo from '../../g-logo.png';
 
 class SignIn extends React.Component {
     state = {
         emailInput: '',
-        passwordInput: ''
+        passwordInput: '',
     }
 
     /* Handle email input field */
@@ -24,21 +26,20 @@ class SignIn extends React.Component {
 
     /* Handle sign in via email */
     handleEmailSignIn = () => {
-        console.log('handleSignIn');
+        this.props.setIsLoading(true);
         Auth.signIn(this.state.emailInput, this.state.passwordInput)
             .then(() => {
-                console.log('handleSignIn then')
                 return Auth.currentSession();
             })
             .then(session => {
-                console.log('auth current session then');
                 chrome.tabs.sendMessage(this.props.tabId, {
                     type: 'auth-session',
                     session: session
                 });
+                this.props.setIsLoading(false);
             })
             .catch(err => {
-                /* Error Handling */
+                this.props.setIsLoading(false);
                 console.log(err);
             });
     }
@@ -89,7 +90,16 @@ class SignIn extends React.Component {
                         Sign up
                     </span>
                 </div>
-                
+
+                <span className={authStyles.orSpan}>Or</span>
+
+                <div className={authStyles.googleBtn} onClick={this.props.googleSignInHandler}>
+                    <div className={authStyles.googleIconWrapper}>
+                        <img class={authStyles.googleIcon} src={GoogleLogo} alt="google-logo"/>
+                    </div>
+                    <p className={authStyles.btnText}><b>Sign in with google</b></p>
+                </div>
+
             </div>
         );
     }

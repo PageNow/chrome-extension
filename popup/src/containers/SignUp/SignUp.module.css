@@ -1,0 +1,39 @@
+.signUpDiv {
+    padding: 15px 20px 10px 20px;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: left;
+    width: 100%;
+}
+
+.signUpHeaderDiv {
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.passwordLabelDiv {
+    margin-top: 7px;
+}
+
+.signUpButton {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.signInDiv {
+    margin-top: 2px;
+    text-align: center;
+}
+
+.signInSpan {
+    margin-left: 5px;
+    color: #0074D9;
+}
+
+.signInSpan:hover {
+    cursor: pointer;
+    color: #003366;
+}

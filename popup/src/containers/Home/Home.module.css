@@ -1,0 +1,28 @@
+.homeDiv {
+    padding: 15px 20px 10px 20px;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: left;
+    width: 100%;
+}
+
+.signOutDiv {
+    width: 100%;
+    text-align: right;
+}
+
+.signOutSpan {
+    color: #0074D9;
+}
+
+.signOutSpan:hover {
+    cursor: pointer;
+    color: #003366;
+}
+
+.toggleButton {
+    width: 100%;
+    margin-top: 10px;
+}

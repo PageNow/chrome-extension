@@ -2,18 +2,22 @@
 import React from 'react';
 import { Auth } from '@aws-amplify/auth';
 import { Hub } from 'aws-amplify';
+import Spinner from 'react-bootstrap/Spinner';
 
-import SignIn from './components/SignIn/SignIn';
-import SignUp from './components/SignUp/SignUp';
-import './App.css';
+import SignIn from './containers/SignIn/SignIn';
+import SignUp from './containers/SignUp/SignUp';
+import Home from './containers/Home/Home';
+import styles from './App.module.css';
 
 class App extends React.Component {
     /* state refreshes every time you open the popup */
     state = {
         chatboxToggledOn: false,
+        authChecked: false, /* Flag for auth state checked */
         authState: null,
         tabInfo: null,
-        authMode: 'sign-in' /* sign-up, sign-in, forgot-password */
+        authMode: 'sign-up', /* sign-up, sign-in, forgot-password, recover-password */
+        isLoading: false
     }
 
     componentDidMount() {
@@ -45,7 +49,10 @@ class App extends React.Component {
                             username: session.idToken.payload['cognito:username'],
                             email: session.idToken.payload['email']
                         };
-                        this.setState({ authState: authState }, () => {
+                        this.setState({
+                            authState: authState,
+                            authChecked: true
+                        }, () => {
                             chrome.tabs.sendMessage(tabs[0].id, {
                                 type: 'auth-session',
                                 session: session
@@ -53,9 +60,11 @@ class App extends React.Component {
                         });
                     })
                     .catch(() => { /* User is not authenticated */
-                        chrome.tabs.sendMessage(tabs[0].id, {
-                            type: 'auth-null'
-                        });
+                        this.setState({ authChecked: true }, () => {
+                            chrome.tabs.sendMessage(tabs[0].id, {
+                                type: 'auth-null'
+                            });
+                        });                        
                     });
             });
         });
@@ -85,20 +94,6 @@ class App extends React.Component {
         window.open('http://localhost:4200/auth-google', '_blank');
     }
 
-    handleSignOut = () => {
-        console.log('handleSignOut');
-        Auth.signOut()
-            .then(() => {
-                console.log('auth sign out then')
-                chrome.tabs.sendMessage(this.state.tabInfo.id, {
-                    type: 'auth-null'
-                });
-            })
-            .catch(err => {
-                console.log(err);
-            });
-    }
-
     /* Toggle chatbox for window */
     toggleChatbox = () => {
         chrome.windows.getCurrent(window => {
@@ -114,29 +109,50 @@ class App extends React.Component {
         });
     }
 
+    setIsLoading = (isLoading) => {
+        this.setState({ isLoading: isLoading })
+    }
+
     render() {
-        let authFormDiv = <div></div>;
+        let popupDiv = <div></div>;
         /* TODO
          * Implement better url matching condition 
          * https://developer.chrome.com/docs/extensions/mv3/match_patterns/
          */
-        if (this.state.tabInfo) {
+
+        if (this.state.authChecked && this.state.authState !== null) {
+            popupDiv = (
+                <Home
+                    tabId={this.state.tabInfo.id}
+                    email={this.state.authState.email}
+                    chatboxToggledOn={this.state.chatboxToggledOn}
+                    toggleChatboxHandler={this.toggleChatbox}
+                />
+            );
+        } else if (this.state.authChecked && this.state.tabInfo) {
             if (this.state.tabInfo.url.startsWith('chrome://')) {
-                authFormDiv = (
+                popupDiv = (
                     <div>
                         Please Switch to a Different Tab to Sign In!
                     </div>
                 );
             } else if (this.state.authMode === 'sign-in') {
-                authFormDiv = (
+                popupDiv = (
                     <SignIn
                         tabId={this.state.tabInfo.id}
                         authModeHandler={this.handleAuthModeChange}
+                        setIsLoading={this.setIsLoading}
+                        googleSignInHandler={this.handleGoogleSignIn}
                     />
                 );
             } else if (this.state.authMode === 'sign-up') {
-                authFormDiv = (
-                    <SignUp />
+                popupDiv = (
+                    <SignUp
+                        tabId={this.state.tabInfo.id}
+                        authModeHandler={this.handleAuthModeChange}
+                        setIsLoading={this.setIsLoading}
+                        googleSignInHandler={this.handleGoogleSignIn}  
+                    />
                 );
             }
         }
@@ -148,19 +164,14 @@ class App extends React.Component {
                         Click to Sign into PageNow
                     </a>
                 </div> */}
-                { authFormDiv }
-                <div>
-                    <button onClick={this.handleSignOut}>SignOut</button>
-                </div>
-                <div>
-                    <button onClick={this.handleGoogleSignIn}>Google Sign In</button>
-                </div>
-                <div>Logged In as {this.state.authState?.email}</div>
-                <div>Chatbox display: {this.state.chatboxToggledOn}</div>
-                <button onClick={this.toggleChatbox}>
-                    {this.state.chatboxToggledOn ? "Close Chatbox" : "Open Chatbox"}
-                </button>
-                
+
+                <div className={styles.modalDiv}
+                    style={{display: this.state.isLoading ? 'block': 'none'}}></div>
+                <Spinner className={styles.spinner} animation="border" variant="info"
+                    style={{display: this.state.isLoading ? 'block': 'none'}}/>
+
+                { popupDiv }
+
             </div>
         );
     }

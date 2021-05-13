@@ -1,0 +1,76 @@
+.orSpan {
+    overflow: hidden;
+    text-align: center;
+    font-size: 12px;
+    color: #808080;
+    margin-bottom: 3px;
+}
+  
+.orSpan:before,
+.orSpan:after {
+    background-color: #A9A9A9;
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+}
+
+.orSpan:before {
+    right: 6px;
+    margin-left: -50%;
+}
+  
+.orSpan:after {
+    left: 6px;
+    margin-right: -50%;
+}
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:500);
+.googleBtn {
+    width: 100%;
+    height: 30px;
+    background-color: #4285f4;
+    border-radius: 2px;
+    box-shadow: 0 3px 4px 0 rgba(0,0,0,.25);
+}
+
+.googleIconWrapper {
+    position: absolute;
+    margin-top: 1px;
+    margin-left: 1px;
+    width: 28px;
+    height: 28px;
+    border-radius: 2px;
+    background-color: #fff;
+}
+
+.googleIcon {
+    position: absolute;
+    margin-top: 6px;
+    margin-left: 6px;
+    width: 14px;
+    height: 14px;
+}
+
+.btnText {
+    margin: 5px 5px 0 60px;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    font-family: "Roboto";
+}
+
+.googleBtn:hover {
+    box-shadow: 0 0 6px #4285f4;
+    cursor: pointer;
+}
+
+.googleBtn:active {
+    background: #1669F2;
+}
+
+/* References
+ * https://codepen.io/stefanjs98/pen/ambVgK
+ */
