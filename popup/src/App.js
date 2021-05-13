@@ -7,6 +7,8 @@ import Spinner from 'react-bootstrap/Spinner';
 import SignIn from './containers/SignIn/SignIn';
 import SignUp from './containers/SignUp/SignUp';
 import Home from './containers/Home/Home';
+import ForgotPassword from './containers/ForgotPassword/ForgotPassword';
+import ResetPassword from './containers/ResetPassword/ResetPassword';
 import styles from './App.module.css';
 
 class App extends React.Component {
@@ -16,8 +18,9 @@ class App extends React.Component {
         authChecked: false, /* Flag for auth state checked */
         authState: null,
         tabInfo: null,
-        authMode: 'sign-up', /* sign-up, sign-in, forgot-password, recover-password */
-        isLoading: false
+        authMode: 'sign-up', /* sign-up, sign-in, forgot-password, reset-password */
+        isLoading: false,
+        forgotPasswordEmail: ''
     }
 
     componentDidMount() {
@@ -71,15 +74,12 @@ class App extends React.Component {
 
         Hub.listen('auth', data => {
             const { payload } = data;
-            console.log('hub payload');
             if (payload.event === 'signIn') {
                 const authState = {
                     username: payload.data.username,
                     email: payload.data.attributes.email
                 }
-                this.setState({ authState: authState }, () => {
-                    console.log('set auth state');
-                });
+                this.setState({ authState: authState });
             } else if (payload.event === 'signOut') {
                 this.setState({ authState: null });
             }
@@ -111,6 +111,14 @@ class App extends React.Component {
 
     setIsLoading = (isLoading) => {
         this.setState({ isLoading: isLoading })
+    }
+
+    handleForgotPasswordEmail = (event) => {
+        this.setState({ forgotPasswordEmail: event.target.value });
+    }
+
+    clearForgotPasswordEmail = () => {
+        this.setState({ forgotPasswordEmail: '' });
     }
 
     render() {
@@ -154,6 +162,24 @@ class App extends React.Component {
                         googleSignInHandler={this.handleGoogleSignIn}  
                     />
                 );
+            } else if (this.state.authMode === 'forgot-password') {
+                popupDiv = (
+                    <ForgotPassword
+                        authModeHandler={this.handleAuthModeChange}
+                        setIsLoading={this.setIsLoading}
+                        forgotPasswordEmail = {this.state.forgotPasswordEmail}
+                        forgotPasswordEmailHandler={this.handleForgotPasswordEmail}
+                    />
+                );
+            } else if (this.state.authMode === 'reset-password') {
+                popupDiv = (
+                    <ResetPassword
+                        authModeHandler={this.handleAuthModeChange}
+                        setIsLoading={this.setIsLoading}
+                        forgotPasswordEmail = {this.state.forgotPasswordEmail}
+                        clearForgotPasswordEmail={this.clearForgotPasswordEmail}
+                    />
+                );
             }
         }
 
@@ -185,4 +211,8 @@ export default App;
 
 /* References
  * https://stackoverflow.com/questions/44968953/how-to-create-a-login-using-google-in-chrome-extension
+ */
+
+/* Bugs to be aware of
+ * https://bugs.chromium.org/p/chromium/issues/detail?id=971701
  */

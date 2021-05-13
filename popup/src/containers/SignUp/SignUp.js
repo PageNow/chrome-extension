@@ -45,7 +45,6 @@ class SignUp extends React.Component {
                 <div className={styles.emailDiv}>
                     <div className={styles.emailLabelDiv}>Email</div>
                     <Form.Control size="sm" type="email"
-                        className={styles.emailForm}
                         placeholder="Enter email"
                         value={this.state.emailInput}
                         onChange={this.handleEmailInputChange}
@@ -55,7 +54,6 @@ class SignUp extends React.Component {
                 <div className={styles.passwordDiv}>
                     <div className={styles.passwordLabelDiv}>Password</div>
                     <Form.Control size="sm" type="password"
-                        className={styles.passwordForm}
                         placeholder="Enter password"
                         value={this.state.passwordInput}
                         onChange={this.handlePasswordInputChange}

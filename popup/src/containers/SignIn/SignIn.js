@@ -51,25 +51,19 @@ class SignIn extends React.Component {
                     <strong>Sign in with email</strong>
                 </div>
 
-                <div className={styles.emailDiv}>
-                    <div className={styles.emailLabelDiv}>Email</div>
-                    <Form.Control size="sm" type="email"
-                        className={styles.emailForm}
-                        placeholder="Enter email"
-                        value={this.state.emailInput}
-                        onChange={this.handleEmailInputChange}
-                    />
-                </div>
+                <div className={styles.emailLabelDiv}>Email</div>
+                <Form.Control size="sm" type="email"
+                    placeholder="Enter email"
+                    value={this.state.emailInput}
+                    onChange={this.handleEmailInputChange}
+                />
 
-                <div className={styles.passwordDiv}>
-                    <div className={styles.passwordLabelDiv}>Password</div>
-                    <Form.Control size="sm" type="password"
-                        className={styles.passwordForm}
-                        placeholder="Enter password"
-                        value={this.state.passwordInput}
-                        onChange={this.handlePasswordInputChange}
-                    />
-                </div>
+                <div className={styles.passwordLabelDiv}>Password</div>
+                <Form.Control size="sm" type="password"
+                    placeholder="Enter password"
+                    value={this.state.passwordInput}
+                    onChange={this.handlePasswordInputChange}
+                />
 
                 <div className={styles.forgotPasswordDiv}>
                     <span className={styles.forgotPasswordSpan}
