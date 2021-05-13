@@ -91,7 +91,7 @@ class SignIn extends React.Component {
                     <div className={authStyles.googleIconWrapper}>
                         <img class={authStyles.googleIcon} src={GoogleLogo} alt="google-logo"/>
                     </div>
-                    <p className={authStyles.btnText}><b>Sign in with google</b></p>
+                    <p className={authStyles.btnText}><b>Continue with google</b></p>
                 </div>
 
             </div>
