@@ -1,3 +1,9 @@
+.warningDiv {
+    color: #DC143C;
+    margin-top: 5px;
+    margin-bottom: -7px;
+}
+
 .orSpan {
     overflow: hidden;
     text-align: center;

@@ -21,5 +21,8 @@
             "css": ["./content_static/static/css/main.css"],
             "match_about_blank": true
         }
-    ]
+    ],
+    "externally_connectable": {
+        "matches": ["http://localhost:4200/*"]
+    }
 }

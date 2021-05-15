@@ -3,12 +3,16 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+// import { Auth } from "@aws-amplify/auth";
+// import awsmobile from "./aws-exports";
 
-const elemId = "chat-extension-root";
+// Auth.configure(awsmobile);
+
+const elemId = "pagenow-extension-root";
 
 const element = document.getElementById(elemId);
 if (element) {
-    alert("Already loaded");
+    alert("PageNow is already loaded");
 } else {
     const extElement = document.createElement("span");
     extElement.id = elemId;

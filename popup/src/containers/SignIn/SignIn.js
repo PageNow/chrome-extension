@@ -7,21 +7,37 @@ import Button from 'react-bootstrap/Button';
 import styles from './SignIn.module.css';
 import authStyles from '../../shared/Auth.module.css';
 import GoogleLogo from '../../g-logo.png';
+import { validateEmail, validatePassword } from '../../shared/FormValidator';
 
 class SignIn extends React.Component {
     state = {
         emailInput: '',
         passwordInput: '',
+        emailInputTouched: false,
+        passwordInputTouched: false,
+        warning: null, /* Warning message from form validation */
+        error: null /* Error message from authentication */
     }
 
     /* Handle email input field */
     handleEmailInputChange = (event) => {
-        this.setState({ emailInput: event.target.value });
+        this.setState({
+            emailInput: event.target.value,
+            emailInputTouched: true
+        });
     }
 
     /* Handle password input field */
     handlePasswordInputChange = (event) => {
-        this.setState({ passwordInput: event.target.value });
+        this.setState({
+            passwordInput: event.target.value,
+            // warning: validatePassword(event.target.value),
+            passwordInputTouched: true
+        });
+    }
+
+    validateEmailInput = () => {
+        this.setState({ warning: validateEmail(this.state.emailInput) });
     }
 
     /* Handle sign in via email */
@@ -40,6 +56,11 @@ class SignIn extends React.Component {
             })
             .catch(err => {
                 this.props.setIsLoading(false);
+                if (err.code === 'UserNotConfirmedException') {
+                    this.props.authModeHandler('confirm-user');
+                } else {
+                    this.setState({ error: err.message, warning: null });
+                }
                 console.log(err);
             });
     }
@@ -56,6 +77,7 @@ class SignIn extends React.Component {
                     placeholder="Enter email"
                     value={this.state.emailInput}
                     onChange={this.handleEmailInputChange}
+                    onBlur={this.validateEmailInput}
                 />
 
                 <div className={styles.passwordLabelDiv}>Password</div>
@@ -65,6 +87,13 @@ class SignIn extends React.Component {
                     onChange={this.handlePasswordInputChange}
                 />
 
+                <div className={authStyles.warningDiv + ' ' + styles.warningDiv}
+                    style={{display: this.state.warning || this.state.error ? 'block' : 'none' }}>
+                    <span>
+                        {this.state.warning ? this.state.warning : this.state.error}
+                    </span>
+                </div>
+
                 <div className={styles.forgotPasswordDiv}>
                     <span className={styles.forgotPasswordSpan}
                         onClick={() => {this.props.authModeHandler('forgot-password')}}>
@@ -72,8 +101,10 @@ class SignIn extends React.Component {
                     </span>
                 </div>
 
-                <Button className={styles.signInButton} 
-                    variant='dark' size='sm' block={true} onClick={this.handleEmailSignIn}>
+                <Button className={styles.signInButton} variant='dark' size='sm'
+                    disabled={this.state.error || this.state.warning ||
+                        !this.state.emailInputTouched || !this.state.passwordInputTouched}
+                    block={true} onClick={this.handleEmailSignIn}>
                     <strong>Sign In</strong>
                 </Button>
                 

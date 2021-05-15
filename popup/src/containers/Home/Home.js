@@ -12,10 +12,13 @@ class Home extends React.Component {
                 chrome.tabs.sendMessage(this.props.tabId, {
                     type: 'auth-null'
                 });
+                chrome.storage.local.remove('google-auth-session');
             })
             .catch(err => {
                 console.log(err);
             });
+
+        /* TODO: turn chatbox iframe off */
     }
 
     render() {

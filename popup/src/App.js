@@ -3,6 +3,15 @@ import React from 'react';
 import { Auth } from '@aws-amplify/auth';
 import { Hub } from 'aws-amplify';
 import Spinner from 'react-bootstrap/Spinner';
+import {
+    CognitoIdToken, 
+    CognitoAccessToken, 
+    CognitoRefreshToken, 
+    CognitoUserSession,
+    CognitoUser,
+    CognitoUserPool
+} from "amazon-cognito-identity-js";
+import awsmobile from './aws-exports';
 
 import SignIn from './containers/SignIn/SignIn';
 import SignUp from './containers/SignUp/SignUp';
@@ -18,7 +27,7 @@ class App extends React.Component {
         authChecked: false, /* Flag for auth state checked */
         authState: null,
         tabInfo: null,
-        authMode: 'sign-up', /* sign-up, sign-in, forgot-password, reset-password */
+        authMode: 'sign-up', /* sign-up, sign-in, forgot-password, reset-password, confirm-user */
         isLoading: false,
         forgotPasswordEmail: ''
     }
@@ -56,6 +65,7 @@ class App extends React.Component {
                             authState: authState,
                             authChecked: true
                         }, () => {
+                            chrome.storage.local.remove('google-auth-session');
                             chrome.tabs.sendMessage(tabs[0].id, {
                                 type: 'auth-session',
                                 session: session
@@ -63,11 +73,60 @@ class App extends React.Component {
                         });
                     })
                     .catch(() => { /* User is not authenticated */
-                        this.setState({ authChecked: true }, () => {
-                            chrome.tabs.sendMessage(tabs[0].id, {
-                                type: 'auth-null'
-                            });
-                        });                        
+                        chrome.storage.local.get(['google-auth-session'], item => {
+                            if (item.hasOwnProperty('google-auth-session')) {
+                                const session = item['google-auth-session'];
+                                const idToken = new CognitoIdToken({
+                                    IdToken: session.idToken.jwtToken
+                                });
+                                const accessToken = new CognitoAccessToken({
+                                    AccessToken: session.accessToken.jwtToken
+                                });
+                                const refreshToken = new CognitoRefreshToken({
+                                    RefreshToken: session.refreshToken.token
+                                });
+                                const clockDrift = session.clockDrift;
+                                const sessionData = {
+                                    IdToken: idToken,
+                                    AccessToken: accessToken,
+                                    RefreshToken: refreshToken,
+                                    ClockDrift: clockDrift
+                                }
+
+                                // Create the session
+                                const userSession  = new CognitoUserSession(sessionData);
+                                const userData = {
+                                    Username: userSession.getIdToken().payload['cognito:username'],
+                                    Pool: new CognitoUserPool({
+                                        UserPoolId: awsmobile.aws_user_pools_id,
+                                        ClientId: awsmobile.aws_user_pools_web_client_id
+                                    })
+                                };
+                                // Make a new cognito user
+                                const cognitoUser = new CognitoUser(userData);
+                                // Attach the session to the user
+                                cognitoUser.setSignInUserSession(userSession);
+                                // Check to make sure it works
+                                cognitoUser.getSession((err, session) => {
+                                    const authState = {
+                                        username: session.idToken.payload['cognito:username'],
+                                        email: session.idToken.payload['email']
+                                    };
+                                    this.setState({
+                                        authState: authState,
+                                        authChecked: true
+                                    });
+                                });
+                                chrome.storage.local.remove('google-auth-session');
+                            } else {
+                                this.setState({ authChecked: true }, () => {
+                                    chrome.tabs.sendMessage(tabs[0].id, {
+                                        type: 'auth-null'
+                                    });
+                                }); 
+                            }
+                        });
+                                               
                     });
             });
         });

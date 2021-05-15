@@ -78,17 +78,17 @@ class SignUp extends React.Component {
                     />
                 </div>
 
-                <div className={styles.warningDiv}
+                <div className={authStyles.warningDiv}
                     style={{display: this.state.warning || this.state.error ? 'block' : 'none' }}>
                     <span>
                         {this.state.warning ? this.state.warning : this.state.error}
                     </span>
                 </div>
 
-                <Button className={styles.signUpButton}
+                <Button className={styles.signUpButton} variant='dark' size='sm'
                     disabled={this.state.error || this.state.warning ||
                               !this.state.emailInputTouched || !this.state.passwordInputTouched}
-                    variant='dark' size='sm' block={true} onClick={this.handleEmailSignUp}>
+                    block={true} onClick={this.handleEmailSignUp}>
                     <strong>Sign Up</strong>
                 </Button>
 
