@@ -19,6 +19,7 @@ import Home from './containers/Home/Home';
 import ForgotPassword from './containers/ForgotPassword/ForgotPassword';
 import ResetPassword from './containers/ResetPassword/ResetPassword';
 import styles from './App.module.css';
+import ConfirmUser from './components/ConfirmUser/ConfirmUser';
 
 class App extends React.Component {
     /* state refreshes every time you open the popup */
@@ -29,7 +30,7 @@ class App extends React.Component {
         tabInfo: null,
         authMode: 'sign-up', /* sign-up, sign-in, forgot-password, reset-password, confirm-user */
         isLoading: false,
-        forgotPasswordEmail: ''
+        userInputEmail: '' /* Used to retain email input for forgot password and account confirmation */
     }
 
     componentDidMount() {
@@ -72,7 +73,7 @@ class App extends React.Component {
                             });
                         });
                     })
-                    .catch(() => { /* User is not authenticated */
+                    .catch((err) => { /* User is not authenticated */
                         chrome.storage.local.get(['google-auth-session'], item => {
                             if (item.hasOwnProperty('google-auth-session')) {
                                 const session = item['google-auth-session'];
@@ -172,12 +173,16 @@ class App extends React.Component {
         this.setState({ isLoading: isLoading })
     }
 
-    handleForgotPasswordEmail = (event) => {
-        this.setState({ forgotPasswordEmail: event.target.value });
+    handleUserInputEmail = (event) => {
+        this.setState({ userInputEmail: event.target.value });
     }
 
-    clearForgotPasswordEmail = () => {
-        this.setState({ forgotPasswordEmail: '' });
+    setUserInputEmail = (inputStr) => {
+        this.setState({ userInputEmail: inputStr });
+    }
+
+    clearUserInputEmail = () => {
+        this.setState({ userInputEmail: '' });
     }
 
     render() {
@@ -210,6 +215,7 @@ class App extends React.Component {
                         authModeHandler={this.handleAuthModeChange}
                         setIsLoading={this.setIsLoading}
                         googleSignInHandler={this.handleGoogleSignIn}
+                        setUserInputEmail={this.setUserInputEmail}
                     />
                 );
             } else if (this.state.authMode === 'sign-up') {
@@ -226,8 +232,8 @@ class App extends React.Component {
                     <ForgotPassword
                         authModeHandler={this.handleAuthModeChange}
                         setIsLoading={this.setIsLoading}
-                        forgotPasswordEmail = {this.state.forgotPasswordEmail}
-                        forgotPasswordEmailHandler={this.handleForgotPasswordEmail}
+                        forgotPasswordEmail = {this.state.userInputEmail}
+                        forgotPasswordEmailHandler={this.handleUserInputEmail}
                     />
                 );
             } else if (this.state.authMode === 'reset-password') {
@@ -235,10 +241,18 @@ class App extends React.Component {
                     <ResetPassword
                         authModeHandler={this.handleAuthModeChange}
                         setIsLoading={this.setIsLoading}
-                        forgotPasswordEmail = {this.state.forgotPasswordEmail}
-                        clearForgotPasswordEmail={this.clearForgotPasswordEmail}
+                        forgotPasswordEmail = {this.state.userInputEmail}
+                        clearForgotPasswordEmail={this.clearUserInputEmail}
                     />
                 );
+            } else if (this.state.authMode === 'confirm-user') {
+                popupDiv = (
+                    <ConfirmUser
+                        authModeHandler={this.handleAuthModeChange}
+                        setIsLoading={this.setIsLoading}
+                        userEmail={this.state.userInputEmail}
+                    />
+                )
             }
         }
 

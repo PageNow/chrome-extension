@@ -1,8 +1,7 @@
-/*global chrome*/
 import React from 'react';
-import { Auth } from '@aws-amplify/auth';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { Auth } from '@aws-amplify/auth';
 
 import styles from './SignUp.module.css';
 import authStyles from '../../shared/Auth.module.css'
@@ -44,6 +43,7 @@ class SignUp extends React.Component {
         Auth.signUp(this.state.emailInput, this.state.passwordInput)
             .then(() => {
                 this.props.setIsLoading(false);
+                this.props.authModeHandler('confirm-user');
                 this.setState({ warning: null, error: null });
             })
             .catch(err => {
@@ -86,7 +86,7 @@ class SignUp extends React.Component {
                 </div>
 
                 <Button className={styles.signUpButton} variant='dark' size='sm'
-                    disabled={this.state.error || this.state.warning ||
+                    disabled={this.state.warning ||
                               !this.state.emailInputTouched || !this.state.passwordInputTouched}
                     block={true} onClick={this.handleEmailSignUp}>
                     <strong>Sign Up</strong>

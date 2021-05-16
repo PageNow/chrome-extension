@@ -4,11 +4,14 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
 import styles from './ResetPassword.module.css';
+import { validatePassword } from '../../shared/FormValidator';
 
 class ResetPassword extends React.Component {
     state = {
         codeInput: '',
         newPasswordInput: '',
+        error: null,
+        warning: null
     }
 
     handleCodeInputChange = (event) => {
@@ -16,7 +19,10 @@ class ResetPassword extends React.Component {
     }
 
     handleNewPasswordInputChange = (event) => {
-        this.setState({ newPasswordInput: event.target.value });
+        this.setState({
+            newPasswordInput: event.target.value,
+            warning: validatePassword(event.target.value)
+        });
     }
 
     handleResetPassword = () => {
@@ -24,14 +30,15 @@ class ResetPassword extends React.Component {
         Auth.forgotPasswordSubmit(this.props.forgotPasswordEmail,
             this.state.codeInput, this.state.newPasswordInput)
             .then(() => {
+                this.setState({ warning: null, error: null });
                 this.props.setIsLoading(false);
                 this.props.authModeHandler('sign-in');
             })
             .catch(err => {
-                this.props.setIsLoading(false);
-                // need error handling
                 console.log(err);
-            })
+                this.props.setIsLoading(false);
+                this.setState({ error: err.message, warning: null });
+            });
     }
 
     render() {
@@ -59,7 +66,14 @@ class ResetPassword extends React.Component {
                     onChange={this.handleNewPasswordInputChange}
                 />
 
-                <Button className={styles.resetPasswordButton} 
+                <div className={styles.resetPasswordErrorDiv}
+                    style={{display: this.state.warning || this.state.error ? 'block' : 'none'}}
+                >
+                    { this.state.warning ? this.state.warning : this.state.error }
+                </div>
+
+                <Button className={styles.resetPasswordButton}
+                    disabled={this.state.warning}
                     variant='dark' size='sm' block={true} onClick={this.handleResetPassword}>
                     <strong>Reset Password</strong>
                 </Button>

@@ -43,6 +43,7 @@ class SignIn extends React.Component {
     /* Handle sign in via email */
     handleEmailSignIn = () => {
         this.props.setIsLoading(true);
+        this.props.setUserInputEmail(this.state.emailInput);
         Auth.signIn(this.state.emailInput, this.state.passwordInput)
             .then(() => {
                 return Auth.currentSession();
@@ -61,7 +62,6 @@ class SignIn extends React.Component {
                 } else {
                     this.setState({ error: err.message, warning: null });
                 }
-                console.log(err);
             });
     }
 
@@ -102,7 +102,7 @@ class SignIn extends React.Component {
                 </div>
 
                 <Button className={styles.signInButton} variant='dark' size='sm'
-                    disabled={this.state.error || this.state.warning ||
+                    disabled={this.state.warning ||
                         !this.state.emailInputTouched || !this.state.passwordInputTouched}
                     block={true} onClick={this.handleEmailSignIn}>
                     <strong>Sign In</strong>

@@ -6,18 +6,33 @@ import { Auth } from '@aws-amplify/auth';
 import styles from './ForgotPassword.module.css';
 
 class ForgotPassword extends React.Component {
+    state = {
+        error: ''
+    }
+
     handleSendCode = () => {
         this.props.setIsLoading(true);
         Auth.forgotPassword(this.props.forgotPasswordEmail)
             .then(() => {
                 this.props.setIsLoading(false);
                 this.props.authModeHandler('reset-password');
+                this.setState({ error: '' });
             })
             .catch(err => {
                 // TODO - error handling (warning message)
                 this.props.setIsLoading(false);
-                this.props.authModeHandler('reset-password');
-                console.log(err);
+                if (err.code === 'InvalidParameterException') {
+                    this.setState({
+                        error: 'Please verify your email before resetting the password'
+                    });
+                } else if (err.code === 'UserNotFoundException') {
+                    this.setState({ 
+                        error: 'Your email is not registered.'
+                    });
+                } else {
+                    console.log(err);
+                    this.setState({ error: err.message });
+                }
             });
     }
 
@@ -40,6 +55,12 @@ class ForgotPassword extends React.Component {
                         value={this.props.forgotPasswordEmail}
                         onChange={this.props.forgotPasswordEmailHandler}
                     />
+                </div>
+
+                <div className={styles.forgotPasswordErrorDiv}
+                    style={{display: this.state.error === '' ? 'none': 'block'}}
+                >
+                    { this.state.error }
                 </div>
 
                 <Button className={styles.sendCodeButton} 
