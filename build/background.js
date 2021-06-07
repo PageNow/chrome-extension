@@ -83,6 +83,7 @@ chrome.runtime.onMessageExternal.addListener(
     function (request, sender, sendResponse) {
         if (request.type === 'google-auth-session') {
             chrome.storage.local.set({ 'google-auth-session': request.data });
+            sendResponse({ code: 'success' });
         }
     });
 

@@ -59,7 +59,7 @@ class App extends React.Component {
                 Auth.currentSession()
                     .then(session => {
                         const authState = {
-                            username: session.idToken.payload['cognito:username'],
+                            userId: session.idToken.payload['cognito:username'],
                             email: session.idToken.payload['email']
                         };
                         this.setState({
@@ -110,7 +110,7 @@ class App extends React.Component {
                                 // Check to make sure it works
                                 cognitoUser.getSession((err, session) => {
                                     const authState = {
-                                        username: session.idToken.payload['cognito:username'],
+                                        userId: session.idToken.payload['cognito:username'],
                                         email: session.idToken.payload['email']
                                     };
                                     this.setState({
@@ -136,7 +136,7 @@ class App extends React.Component {
             const { payload } = data;
             if (payload.event === 'signIn') {
                 const authState = {
-                    username: payload.data.username,
+                    userId: payload.data.username,
                     email: payload.data.attributes.email
                 }
                 this.setState({ authState: authState });
