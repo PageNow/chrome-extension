@@ -1,0 +1,28 @@
+.confirmUserDiv {
+    padding: 15px 20px 10px 20px;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: left;
+    width: 100%;
+}
+
+.confirmUserHeaderDiv {
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.confirmUserButton {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.confirmUserMessageDiv {
+    color: #0074D9;
+}
+
+.confirmUserErrorDiv {
+    color: #DC143C;
+}

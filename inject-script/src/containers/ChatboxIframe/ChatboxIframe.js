@@ -65,6 +65,15 @@ if (chrome && chrome.extension) {
                     title: message.tabTitle
                 }
             });
+        } else if (message.type === 'auth-session') {
+            sendMsgToIframe({
+                type: 'auth-session',
+                data: message.session
+            });
+        } else if (message.type === 'auth-null') {
+            sendMsgToIframe({
+                type: 'auth-null'
+            });
         }
         sendResponse(null);
     });

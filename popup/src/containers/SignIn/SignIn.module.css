@@ -1,0 +1,57 @@
+/* $white: #fff;
+$google-blue: #4285f4;
+$button-active-blue: #1669F2; */
+
+.signInDiv {
+    padding: 15px 20px 10px 20px;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: left;
+    width: 100%;
+}
+
+.signInHeaderDiv {
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.passwordLabelDiv {
+    margin-top: 7px;
+}
+
+.signInButton {
+    width: 100%;
+    margin-top: 6px;
+}
+
+.forgotPasswordDiv {
+    margin-top: 2px;
+    text-align: right;
+}
+
+.forgotPasswordSpan {
+    color: #0074D9;
+}
+
+.forgotPasswordSpan:hover {
+    cursor: pointer;
+    color: #003366;
+}
+
+.signUpDiv {
+    margin-top: 7px;
+    text-align: center;
+}
+
+.signUpSpan {
+    margin-left: 5px;
+    color: #0074D9;
+}
+
+.signUpSpan:hover {
+    cursor: pointer;
+    color: #003366;
+}

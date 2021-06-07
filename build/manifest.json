@@ -18,7 +18,11 @@
         {
             "matches": ["<all_urls>"],
             "js": ["./content_static/static/js/main.js", "/content_static/static/js/1.chunk.js"],
-            "css": ["./content_static/static/css/main.css"]
+            "css": ["./content_static/static/css/main.css"],
+            "match_about_blank": true
         }
-    ]
+    ],
+    "externally_connectable": {
+        "matches": ["http://localhost:4200/*"]
+    }
 }

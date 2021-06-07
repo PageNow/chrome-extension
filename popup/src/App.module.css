@@ -1,0 +1,17 @@
+.spinner {
+    position: absolute; /* or fixed */
+    top: 145px;
+    left: 110px;
+    opacity: 1;
+}
+
+.modalDiv {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: black;
+    opacity: 0.2;
+    z-index: 998;
+    height: 100%;
+    width: 100%;
+}

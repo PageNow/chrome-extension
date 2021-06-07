@@ -69,10 +69,22 @@ chrome.windows.onCreated.addListener(function(windowId) {
                 windowIdKeyArr.push('windowChatboxOpen_' + windowArr[i].id);
             }
             for (var prop in items) {
-                if (prop.startsWith('windowChatboxOpen_') && !windowIdKeyArr.includes(prop)) {
+                if (prop.startsWith('windowChatboxOpen_') && 
+                        !windowIdKeyArr.includes(prop)) {
                     chrome.storage.local.remove(prop);
                 }
             }
         });
     });
 });
+
+//Listen for incoming external messages.
+chrome.runtime.onMessageExternal.addListener(
+    function (request, sender, sendResponse) {
+        if (request.type === 'google-auth-session') {
+            chrome.storage.local.set({ 'google-auth-session': request.data });
+            sendResponse({ code: 'success' });
+        }
+    });
+
+// TODO: set everything to false when disconnect?

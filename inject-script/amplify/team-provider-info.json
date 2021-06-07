@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-pagenow-dev-12529-authRole",
+      "UnauthRoleArn": "arn:aws:iam::257206538165:role/amplify-pagenow-dev-12529-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::257206538165:role/amplify-pagenow-dev-12529-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-pagenow-dev-12529-deployment",
+      "UnauthRoleName": "amplify-pagenow-dev-12529-unauthRole",
+      "StackName": "amplify-pagenow-dev-12529",
+      "StackId": "arn:aws:cloudformation:us-east-1:257206538165:stack/amplify-pagenow-dev-12529/4b1781c0-acb2-11eb-aaad-0eefdf6f3ed5",
+      "AmplifyAppId": "d1dqdybcniloq3"
+    },
+    "categories": {
+      "auth": {
+        "pagenow82cf5108": {}
+      }
+    }
+  }
+}
