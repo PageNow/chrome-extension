@@ -151,7 +151,7 @@ class App extends React.Component {
     }
 
     handleGoogleSignIn = () => {
-        window.open('http://localhost:4200/auth-google', '_blank');
+        window.open('http://localhost:4200/auth/google', '_blank');
     }
 
     /* Toggle chatbox for window */

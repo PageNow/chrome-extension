@@ -4,12 +4,15 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
 import styles from './ResetPassword.module.css';
+import authStyles from '../../shared/Auth.module.css';
 import { validatePassword } from '../../shared/FormValidator';
+import AuthFooter from '../../components/AuthFooter/AuthFooter';
 
 class ResetPassword extends React.Component {
     state = {
         codeInput: '',
         newPasswordInput: '',
+        passwordConfirmInput: '',
         error: null,
         warning: null
     }
@@ -23,6 +26,17 @@ class ResetPassword extends React.Component {
             newPasswordInput: event.target.value,
             warning: validatePassword(event.target.value)
         });
+    }
+
+    handlePasswordConfirmInputChange = (event) => {
+        this.setState({
+            passwordConfirmInput: event.target.value,
+            warning: this.state.newPasswordInput !== event.target.value ? 'The passwords do not match.' : ''
+        })
+    }
+
+    handleClickBack = () => {
+        this.props.authModeHandler('forgot-password');
     }
 
     handleResetPassword = () => {
@@ -44,26 +58,36 @@ class ResetPassword extends React.Component {
     render() {
         return (
             <div className={styles.resetPasswordDiv}>
-                {/* <div className={styles.resetPasswordHeaderDiv}>
+                <div className={authStyles.backDiv}>
+                    <span className={authStyles.backSpan} onClick={this.handleClickBack}>
+                        &lt; Back
+                    </span>
+                </div>
+                <div className={authStyles.authHeaderDiv}>
                     <strong>Reset password</strong>
-                </div> */}
-
-                <div className={styles.resetPasswordSubheaderDiv}>
-                    Check your email for the code to reset password.
                 </div>
 
-                <div className={styles.codeLabelDiv}>Verification Code</div>
-                <Form.Control size="sm" type="text"
-                    placeholder="Enter code"
-                    value={this.state.codeInput}
-                    onChange={this.handleCodeInputChange}
-                />
+                <div className={styles.codeDiv}>
+                    <div className={styles.codeLabelDiv}>Verification Code</div>
+                    <Form.Control size="sm" type="text"
+                        placeholder="Enter code"
+                        value={this.state.codeInput}
+                        onChange={this.handleCodeInputChange}
+                    />
+                </div>
 
                 <div className={styles.newPasswordLabelDiv}>New Password</div>
                 <Form.Control size="sm" type="password"
                     placeholder="Enter new password"
                     value={this.state.newPasswordInput}
                     onChange={this.handleNewPasswordInputChange}
+                />
+
+                <div className={styles.newPasswordLabelDiv}>Confirm Password</div>
+                <Form.Control size="sm" type="password"
+                    placeholder="Confirm password"
+                    value={this.state.passwordConfirmInput}
+                    onChange={this.handlePasswordConfirmInputChange}
                 />
 
                 <div className={styles.resetPasswordErrorDiv}
@@ -78,6 +102,7 @@ class ResetPassword extends React.Component {
                     <strong>Reset Password</strong>
                 </Button>
 
+                <AuthFooter />
             </div>
         );
     }

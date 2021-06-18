@@ -15,7 +15,7 @@ export const validatePassword = (inputStr) => {
     } else if (inputStr.toLowerCase() === inputStr) {
         return "Password must have uppercase characters.";
     } else if (!/\d/.test(inputStr)) {
-        return "Password must contain a number";
+        return "Password must contain a number.";
     } else if (inputStr.length < 8) {
         return "Password must have at least 8 characters.";
     } else {

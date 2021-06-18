@@ -7,6 +7,7 @@ import styles from './SignUp.module.css';
 import authStyles from '../../shared/Auth.module.css'
 import GoogleLogo from '../../g-logo.png';
 import { validateEmail, validatePassword } from '../../shared/FormValidator';
+import AuthFooter from '../../components/AuthFooter/AuthFooter';
 
 class SignUp extends React.Component {
     state = {
@@ -15,6 +16,7 @@ class SignUp extends React.Component {
         passwordConfirmInput: '',
         emailInputTouched: false,
         passwordInputTouched: false,
+        passwordConfirmInputTouched: false,
         warning: null, /* Warning message from form validation */
         error: null /* Error message from authentication */
     }
@@ -31,6 +33,24 @@ class SignUp extends React.Component {
             passwordInput: event.target.value,
             warning: validatePassword(event.target.value),
             passwordInputTouched: true
+        });
+    }
+
+    handlePasswordConfirmInputChange = (event) => {
+        this.setState({
+            passwordConfirmInput: event.target.value,
+            passwordConfirmInputTouched: true
+        }, () => {
+            if (this.state.passwordConfirmInputTouched && 
+                this.state.passwordInput !== this.state.passwordConfirmInput) {
+                this.setState({
+                    warning: "The passwords do not match."
+                });
+            } else {
+                this.setState({
+                    warning: ''
+                });
+            }
         });
     }
 
@@ -55,8 +75,8 @@ class SignUp extends React.Component {
     render() {
         return (
             <div className={styles.signUpDiv}>
-                <div className={styles.signUpHeaderDiv}>
-                    <strong>Sign up with email</strong>
+                <div className={authStyles.authHeaderDiv}>
+                    <strong>PageNow SignUp</strong>
                 </div>
 
                 <div className={styles.emailDiv}>
@@ -78,6 +98,15 @@ class SignUp extends React.Component {
                     />
                 </div>
 
+                <div className={styles.passwordDiv}>
+                    <div className={styles.passwordLabelDiv}>Confirm Password</div>
+                    <Form.Control size="sm" type="password"
+                        placeholder="Confirm password"
+                        value={this.state.passwordConfirmInput}
+                        onChange={this.handlePasswordConfirmInputChange}
+                    />
+                </div>
+
                 <div className={authStyles.warningDiv}
                     style={{display: this.state.warning || this.state.error ? 'block' : 'none' }}>
                     <span>
@@ -87,7 +116,8 @@ class SignUp extends React.Component {
 
                 <Button className={styles.signUpButton} variant='dark' size='sm'
                     disabled={this.state.warning ||
-                              !this.state.emailInputTouched || !this.state.passwordInputTouched}
+                              !this.state.emailInputTouched || !this.state.passwordInputTouched ||
+                              this.state.passwordInput !== this.state.passwordConfirmInput}
                     block={true} onClick={this.handleEmailSignUp}>
                     <strong>Sign Up</strong>
                 </Button>
@@ -109,6 +139,7 @@ class SignUp extends React.Component {
                     <p className={authStyles.btnText}><b>Continue with google</b></p>
                 </div>
 
+                <AuthFooter />
             </div>
         );
     }

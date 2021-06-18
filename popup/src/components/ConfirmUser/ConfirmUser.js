@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import { Auth } from '@aws-amplify/auth';
 
 import styles from './ConfirmUser.module.css';
+import authStyles from '../../shared/Auth.module.css'
 
 const ConfirmUser = (props) => {
     const [error, setError] = useState("");
@@ -25,7 +26,7 @@ const ConfirmUser = (props) => {
 
     return (
         <div className={styles.confirmUserDiv}>
-            <div className={styles.confirmUserHeaderDiv}>
+            <div className={authStyles.authHeaderDiv}>
                 <strong>Verify your account</strong>
             </div>
 

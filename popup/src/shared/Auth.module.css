@@ -1,3 +1,11 @@
+.authHeaderDiv {
+    font-size: 15px;
+    margin-bottom: 5px;
+    text-align: center;
+    font-family: 'Roboto' sans-serif;
+    font-weight: 700;
+}
+
 .warningDiv {
     color: #DC143C;
     margin-top: 5px;
@@ -32,6 +40,19 @@
 .orSpan:after {
     left: 6px;
     margin-right: -50%;
+}
+
+.backDiv {
+    margin-bottom: -3px;
+}
+
+.backSpan {
+    color: #0074D9
+}
+
+.backSpan:hover {
+    cursor: pointer;
+    color: #003366;
 }
 
 @import url(https://fonts.googleapis.com/css?family=Roboto:500);

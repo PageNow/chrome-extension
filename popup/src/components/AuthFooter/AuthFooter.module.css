@@ -1,0 +1,16 @@
+.footerDiv {
+    font-size: 13px;
+    padding-top: 10px;
+    text-align: center;
+}
+
+.linkA {
+    text-decoration: none;
+    color: #0074D9;
+    padding-left: 3px;
+}
+
+.linkA:hover {
+    cursor: pointer;
+    color: #003366;
+}

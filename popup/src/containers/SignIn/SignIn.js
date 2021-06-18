@@ -7,7 +7,8 @@ import Button from 'react-bootstrap/Button';
 import styles from './SignIn.module.css';
 import authStyles from '../../shared/Auth.module.css';
 import GoogleLogo from '../../g-logo.png';
-import { validateEmail, validatePassword } from '../../shared/FormValidator';
+import { validateEmail } from '../../shared/FormValidator';
+import AuthFooter from '../../components/AuthFooter/AuthFooter';
 
 class SignIn extends React.Component {
     state = {
@@ -68,8 +69,8 @@ class SignIn extends React.Component {
     render() {
         return (
             <div className={styles.signInDiv}>
-                <div className={styles.signInHeaderDiv}>
-                    <strong>Sign in with email</strong>
+                <div className={authStyles.authHeaderDiv}>
+                    <strong>PageNow SignIn</strong>
                 </div>
 
                 <div className={styles.emailLabelDiv}>Email</div>
@@ -124,7 +125,7 @@ class SignIn extends React.Component {
                     </div>
                     <p className={authStyles.btnText}><b>Continue with google</b></p>
                 </div>
-
+                <AuthFooter />
             </div>
         );
     }

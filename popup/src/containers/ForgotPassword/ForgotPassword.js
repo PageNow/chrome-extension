@@ -4,10 +4,26 @@ import Button from 'react-bootstrap/Button';
 import { Auth } from '@aws-amplify/auth';
 
 import styles from './ForgotPassword.module.css';
+import authStyles from '../../shared/Auth.module.css';
+import AuthFooter from '../../components/AuthFooter/AuthFooter';
+import { validateEmail } from '../../shared/FormValidator';
 
 class ForgotPassword extends React.Component {
     state = {
         error: ''
+    }
+
+    handleClickBack = () => {
+        this.props.authModeHandler('sign-in')
+    }
+
+    validateEmailInput = () => {
+        this.setState({ error: validateEmail(this.props.forgotPasswordEmail) });
+    }
+
+    handleEmailInputChange = (event) => {
+        this.props.forgotPasswordEmailHandler(event);
+        this.validateEmailInput();
     }
 
     handleSendCode = () => {
@@ -39,12 +55,17 @@ class ForgotPassword extends React.Component {
     render() {
         return (
             <div className={styles.forgotPasswordDiv}>
-                <div className={styles.forgotPasswordHeaderDiv}>
-                    <strong>Forgot password</strong>
+                <div className={authStyles.backDiv}>
+                    <span className={authStyles.backSpan} onClick={this.handleClickBack}>
+                        &lt; Back
+                    </span>
+                </div>
+                <div className={authStyles.authHeaderDiv}>
+                    <strong>Forgot Password</strong>
                 </div>
 
                 <div className={styles.forgotPasswordSubheaderDiv}>
-                    Enter your email and we will send you a verification code
+                    Enter your email and we will send you a verification code.
                 </div>
 
                 <div>
@@ -53,7 +74,7 @@ class ForgotPassword extends React.Component {
                         className={styles.emailForm}
                         placeholder="Enter email"
                         value={this.props.forgotPasswordEmail}
-                        onChange={this.props.forgotPasswordEmailHandler}
+                        onChange={this.handleEmailInputChange}
                     />
                 </div>
 
@@ -64,9 +85,22 @@ class ForgotPassword extends React.Component {
                 </div>
 
                 <Button className={styles.sendCodeButton} 
-                    variant='dark' size='sm' block={true} onClick={this.handleSendCode}>
+                    variant='dark' size='sm' block={true} onClick={this.handleSendCode}
+                    disabled={(this.state.error !== null && this.state.error !== '') ||
+                              this.props.forgotPasswordEmail === ''}
+                >
                     <strong>Send Verification Code</strong>
                 </Button>
+
+                <Button className={styles.sendCodeButton} 
+                    variant='dark' size='sm' block={true} onClick={() => this.props.authModeHandler('reset-password')}
+                    disabled={(this.state.error !== null && this.state.error !== '') ||
+                              this.props.forgotPasswordEmail === ''}
+                >
+                    <strong>I have Verification Code!</strong>
+                </Button>
+
+                <AuthFooter />
             </div>
         );
     }
