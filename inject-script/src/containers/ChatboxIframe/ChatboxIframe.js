@@ -35,7 +35,7 @@ function ChatboxIframe() {
                                   ? 'block' : 'none' }}
                  className='chatbox-iframe-rnd'
                  minWidth="300" minHeight="400"
-                 default={{x: 0, y: 0, width: 300, height: 400}}
+                 default={{x: 0, y: 0, width: 400, height: 500}}
                  dragAxis="x">
                 <iframe
                     allow="autoplay"

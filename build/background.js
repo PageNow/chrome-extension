@@ -16,13 +16,15 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 // when the tab on a window is changed
 chrome.tabs.onActivated.addListener(function(activeInfo) {
     chrome.tabs.get(activeInfo.tabId, tab => {
-        chrome.tabs.sendMessage(activeInfo.tabId, {
-            type: 'change-tab',
-            tabId: tab.id,
-            tabUrl: tab.url,
-            tabTitle: tab.title,
-            tabWindowId: tab.windowId
-        });
+        if (tab) {
+            chrome.tabs.sendMessage(activeInfo.tabId, {
+                type: 'change-tab',
+                tabId: tab.id,
+                tabUrl: tab.url,
+                tabTitle: tab.title,
+                tabWindowId: tab.windowId
+            });
+        }
     });
 });
 
@@ -84,7 +86,16 @@ chrome.runtime.onMessageExternal.addListener(
         if (request.type === 'google-auth-session') {
             chrome.storage.local.set({ 'google-auth-session': request.data });
             sendResponse({ code: 'success' });
+        } else if (request.type === 'window-chatbox-close') {
+            var chatWindowOpenKey = 'windowChatboxOpen_' + sender.tab.windowId;
+            chrome.storage.local.get(chatWindowOpenKey, function(item) {
+                if (item) {
+                    chrome.storage.local.remove(chatWindowOpenKey);
+                }
+            })
         }
-    });
+    }
+);
+
 
 // TODO: set everything to false when disconnect?

@@ -35,7 +35,7 @@ const ConfirmUser = (props) => {
                     Please confirm your email by clicking the verification link sent to your email.
                 </p>
                 <p>
-                    Re-open the popup window after you confirm your email.
+                    Re-open the popup window after you confirm your email and sign in again.
                 </p>
                 <p>
                     If you cannot find the email, check the spam folder or click the button below to resend the link.
