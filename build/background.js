@@ -1,4 +1,5 @@
 var windowChatboxOpen = {};
+var websocket;
 
 // when the tab url is updated
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
@@ -97,5 +98,34 @@ chrome.runtime.onMessageExternal.addListener(
     }
 );
 
+// Listen for runtime messages
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+        if (request.type === 'auth-jwt') {
+            chrome.storage.local.set({ 'auth-jwt': request.data });
+            sendResponse({ code: 'success' });
+        } else if (request.type === 'connect-to-websocket') { // only for testing
+            connectWebsocket();
+        }
+    }
+);
+
+function connectWebsocket() {
+    if (websocket == null | websocket == undefined) {
+        try {
+            chrome.storage.local.get('auth-jwt', function(item) {
+                if (item && item['auth-jwt']) {
+                    websocket = new WebSocket(`wss://dzcictr00f.execute-api.us-west-2.amazonaws.com/dev/?Authorization=${item['auth-jwt']}`);
+                } else {
+                    console.log("JWT is missing");
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    } else {
+        console.log(websocket);
+    }
+}
 
 // TODO: set everything to false when disconnect?

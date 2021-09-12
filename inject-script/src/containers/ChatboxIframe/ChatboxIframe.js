@@ -34,7 +34,7 @@ function ChatboxIframe() {
             <Rnd style={{display: chatboxOpen
                                   ? 'block' : 'none' }}
                  className='chatbox-iframe-rnd'
-                 minWidth="300" minHeight="400"
+                 minWidth="400" minHeight="200"
                  default={{x: 0, y: 0, width: 400, height: 500}}
                  dragAxis="x">
                 <iframe

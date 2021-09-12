@@ -54,6 +54,10 @@ class SignIn extends React.Component {
                     type: 'auth-session',
                     session: session
                 });
+                chrome.runtime.sendMessage({
+                    type: 'auth-jwt',
+                    data: session.getIdToken().getJwtToken()
+                });
                 this.props.setIsLoading(false);
             })
             .catch(err => {

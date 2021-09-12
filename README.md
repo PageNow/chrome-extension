@@ -14,4 +14,14 @@ Run ```npm run-script build``` inside `popup/` and `inject-script/` to build the
 
 ## Notes
 
-Note that Google accounts sign-in cannot happen in an iframe due to Google's policy. Thus, we need to set up the authentication in popup.html.
+* Note that Google accounts sign-in cannot happen in an iframe due to Google's policy. Thus, we need to set up the authentication in popup.html.
+
+* wss doesn't accept headers, so we need to pass it as query param and verify at Lambda function level
+
+## References
+
+### background.js websocket
+
+* https://github.com/fregante/GhostText/blob/main/source/background.js
+* https://medium.com/swlh/implementing-secure-web-sockets-with-aws-api-gateway-cognito-dynamodb-and-lambda-b38e02314b42
+* http://iostreamer.me/ws/node.js/jwt/2016/05/08/websockets_authentication.html

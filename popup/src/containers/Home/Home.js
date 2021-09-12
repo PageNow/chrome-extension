@@ -12,7 +12,7 @@ class Home extends React.Component {
                 chrome.tabs.sendMessage(this.props.tabId, {
                     type: 'auth-null'
                 });
-                chrome.storage.local.remove(['google-auth-session']);
+                chrome.storage.local.remove(['google-auth-session', 'auth-jwt']);
                 /* Remove all chatbox open status */
                 chrome.storage.local.get(null, items => {
                     const chatboxKeys = Object.keys(items).filter(k => k.startsWith('windowChatboxOpen_'));
@@ -22,6 +22,12 @@ class Home extends React.Component {
             .catch(err => {
                 console.log(err);
             });
+    }
+
+    connectToWebsocket = () => {
+        chrome.runtime.sendMessage({
+            type: 'connect-to-websocket'
+        });
     }
 
     render() {
@@ -39,6 +45,9 @@ class Home extends React.Component {
                     <strong>
                         {this.props.chatboxToggledOn ? "Close Chatbox" : "Open Chatbox"}
                     </strong>
+                </Button>
+                <Button onClick={this.connectToWebsocket}>
+                    Connect to websocket
                 </Button>
             </div>
         );

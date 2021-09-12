@@ -71,6 +71,10 @@ class App extends React.Component {
                                 type: 'auth-session',
                                 session: session
                             });
+                            chrome.runtime.sendMessage({
+                                type: 'auth-jwt',
+                                data: session.getIdToken().getJwtToken()
+                            });
                         });
                     })
                     .catch((err) => { /* User is not authenticated */
@@ -125,6 +129,7 @@ class App extends React.Component {
                                         type: 'auth-null'
                                     });
                                 }); 
+                                chrome.storage.local.remove('auth-jwt');
                             }
                         });
                                                
