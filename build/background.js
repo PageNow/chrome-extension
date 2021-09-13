@@ -101,21 +101,31 @@ chrome.runtime.onMessageExternal.addListener(
 // Listen for runtime messages
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
-        if (request.type === 'auth-jwt') {
-            chrome.storage.local.set({ 'auth-jwt': request.data });
-            sendResponse({ code: 'success' });
-        } else if (request.type === 'connect-to-websocket') { // only for testing
-            connectWebsocket();
+        switch (request.type) {
+            case 'auth-jwt':
+                chrome.storage.local.set({ 'auth-jwt': request.data });
+                sendResponse({ code: 'success' });
+                break;
+            case 'connect-websocket':
+                connectWebsocket();
+                break;
+            case 'disconnect-websocket':
+                disconnectWebsocket();
+                break;
+            default:
+                console.log("Request type not found");
         }
     }
 );
 
 function connectWebsocket() {
+    const wsHost = 'wss://hjigecbja1.execute-api.us-west-2.amazonaws.com/dev/';
     if (websocket == null | websocket == undefined) {
         try {
             chrome.storage.local.get('auth-jwt', function(item) {
                 if (item && item['auth-jwt']) {
-                    websocket = new WebSocket(`wss://dzcictr00f.execute-api.us-west-2.amazonaws.com/dev/?Authorization=${item['auth-jwt']}`);
+                    websocket = new WebSocket(`${wsHost}?Authorization=${item['auth-jwt']}`);
+                    console.log('Connected to', websocket);
                 } else {
                     console.log("JWT is missing");
                 }
@@ -124,7 +134,17 @@ function connectWebsocket() {
             console.log(error);
         }
     } else {
-        console.log(websocket);
+        console.log('Already connected to', websocket);
+    }
+}
+
+function disconnectWebsocket() {
+    if (websocket != null || websocket != undefined) {
+        console.log('Closing', websocket);
+        websocket.close();
+        websocket = undefined;
+    } else {
+        console.log('Websocket is already closed');
     }
 }
 

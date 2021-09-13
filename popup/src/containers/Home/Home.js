@@ -24,9 +24,15 @@ class Home extends React.Component {
             });
     }
 
-    connectToWebsocket = () => {
+    connectWebsocket = () => {
         chrome.runtime.sendMessage({
-            type: 'connect-to-websocket'
+            type: 'connect-websocket'
+        });
+    }
+
+    disconnectWebsocket = () => {
+        chrome.runtime.sendMessage({
+            type: 'disconnect-websocket'
         });
     }
 
@@ -46,8 +52,11 @@ class Home extends React.Component {
                         {this.props.chatboxToggledOn ? "Close Chatbox" : "Open Chatbox"}
                     </strong>
                 </Button>
-                <Button onClick={this.connectToWebsocket}>
-                    Connect to websocket
+                <Button onClick={this.connectWebsocket}>
+                    Connect websocket
+                </Button>
+                <Button onClick={this.disconnectWebsocket}>
+                    Disconnect websocket
                 </Button>
             </div>
         );
