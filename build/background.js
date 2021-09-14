@@ -112,6 +112,10 @@ chrome.runtime.onMessage.addListener(
             case 'disconnect-websocket':
                 disconnectWebsocket();
                 break;
+            case 'websocket-status':
+                var status = getWebsocketStatus();
+                sendResponse({ status: status });
+                break;
             default:
                 console.log("Request type not found");
         }
@@ -119,13 +123,25 @@ chrome.runtime.onMessage.addListener(
 );
 
 function connectWebsocket() {
-    const wsHost = 'wss://hjigecbja1.execute-api.us-west-2.amazonaws.com/dev/';
+    const wsHost = 'wss://hna5px6917.execute-api.us-west-2.amazonaws.com/dev/';
     if (websocket == null | websocket == undefined) {
         try {
             chrome.storage.local.get('auth-jwt', function(item) {
                 if (item && item['auth-jwt']) {
                     websocket = new WebSocket(`${wsHost}?Authorization=${item['auth-jwt']}`);
                     console.log('Connected to', websocket);
+                    websocket.onmessage = function (event) {
+                        var data = JSON.parse(event.data);
+                        console.log(event);
+                        chrome.runtime.sendMessage({
+                            type: 'update-presence',
+                            data: data
+                        });
+                    }
+                    websocket.onclose = function() {
+                        console.log('Websocket closed');
+                        websocket = undefined;
+                    }
                 } else {
                     console.log("JWT is missing");
                 }
@@ -145,6 +161,14 @@ function disconnectWebsocket() {
         websocket = undefined;
     } else {
         console.log('Websocket is already closed');
+    }
+}
+
+function getWebsocketStatus() {
+    if (websocket == null || websocket == undefined) {
+        return -1;
+    } else {
+        return websocket.readyState;
     }
 }
 

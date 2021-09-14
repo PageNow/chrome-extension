@@ -6,6 +6,25 @@ import { Auth } from '@aws-amplify/auth';
 import styles from './Home.module.css'
 
 class Home extends React.Component {
+    state = {
+        websocketStatus: -1
+    }
+
+    componentDidMount() {
+        chrome.runtime.onMessage.addListener(
+            function (request, sender, sendResponse) {
+                switch (request.type) {
+                    case 'update-presence':
+                        console.log(request.data);
+                        break;
+                    default:
+                        console.log('request type not found');
+                        break;
+                }
+            }
+        )
+    }
+
     handleSignOut = () => {
         Auth.signOut()
             .then(() => {
@@ -36,6 +55,15 @@ class Home extends React.Component {
         });
     }
 
+    getWebsocketStatus = () => {
+        chrome.runtime.sendMessage({
+            type: 'websocket-status'
+        }, response => {
+            console.log(response);
+            this.setState({ websocketStatus: response.status });
+        });
+    }
+
     render() {
         return (
             <div className={styles.homeDiv}>
@@ -58,6 +86,12 @@ class Home extends React.Component {
                 <Button onClick={this.disconnectWebsocket}>
                     Disconnect websocket
                 </Button>
+                <Button onClick={this.getWebsocketStatus}>
+                    Get websocket status
+                </Button>
+                <div>
+                    Websocket Status: {this.state.websocketStatus}
+                </div>
             </div>
         );
     }
