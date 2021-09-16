@@ -2,8 +2,10 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import { Auth } from '@aws-amplify/auth';
+import axios from 'axios';
 
-import styles from './Home.module.css'
+import styles from './Home.module.css';
+import { USER_API_URL } from '../../shared/constants';
 
 class Home extends React.Component {
     state = {
@@ -23,6 +25,56 @@ class Home extends React.Component {
                 }
             }
         )
+
+        Auth.currentSession()
+            .then(session => {
+                return axios.get(`${USER_API_URL}/users/me`, {
+                    headers: { Authorization: `Bearer ${session.getIdToken().getJwtToken()}` }
+                });
+            })
+            .then(res => {
+                console.log(res);
+                const message = {
+                    type: 'update-user-info',
+                    data: {
+                        userId: res.data.user_id,
+                        shareMode: res.data.share_mode,
+                        domainAllowSet: res.data.domain_allow_array,
+                        domainDenySet: res.data.domain_deny_array
+                    }
+                };
+                // chrome.runtime.sendMessage(EXTENSION_ID, message);
+                chrome.runtime.sendMessage(message);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    getUserInfo = () => {
+        Auth.currentSession()
+            .then(session => {
+                return axios.get(`${USER_API_URL}/users/me`, {
+                    headers: { Authorization: `Bearer ${session.getIdToken().getJwtToken()}` }
+                });
+            })
+            .then(res => {
+                console.log(res);
+                const message = {
+                    type: 'update-user-info',
+                    data: {
+                        userId: res.data.user_id,
+                        shareMode: res.data.share_mode,
+                        domainAllowSet: res.data.domain_allow_array,
+                        domainDenySet: res.data.domain_deny_array
+                    }
+                };
+                // chrome.runtime.sendMessage(EXTENSION_ID, message);
+                chrome.runtime.sendMessage(message);
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
     handleSignOut = () => {
@@ -92,6 +144,9 @@ class Home extends React.Component {
                 <div>
                     Websocket Status: {this.state.websocketStatus}
                 </div>
+                <Button onClick={this.getUserInfo}>
+                    Get user info
+                </Button>
             </div>
         );
     }
