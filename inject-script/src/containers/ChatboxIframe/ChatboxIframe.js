@@ -56,24 +56,32 @@ export default ChatboxIframe;
 
 if (chrome && chrome.extension) {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.type === 'update-tab' || message.type === 'change-tab' || message.type === 'change-window') {
-            chrome.storage.local.set({ windowId: message.tabWindowId });
-            sendMsgToIframe({
-                type: 'update-url',
-                data: {
-                    url: message.tabUrl,
-                    title: message.tabTitle
-                }
-            });
-        } else if (message.type === 'auth-session') {
-            sendMsgToIframe({
-                type: 'auth-session',
-                data: message.session
-            });
-        } else if (message.type === 'auth-null') {
-            sendMsgToIframe({
-                type: 'auth-null'
-            });
+        switch (message.type) {
+            case 'auth-session':
+                sendMsgToIframe({
+                    type: 'auth-session',
+                    data: message.session
+                });
+                break;
+            case 'auth-null':
+                sendMsgToIframe({
+                    type: 'auth-null'
+                });
+                break;
+            case 'update-presence':
+                sendMsgToIframe({
+                    type: 'update-presence',
+                    data: {
+                        type: 'update-presence',
+                        userId: message.userId,
+                        url: message.url,
+                        title: message.title
+                    }
+                });
+                break;
+            default:
+                console.log('Message type ' + message.type + ' is unknown');
+                break;
         }
         sendResponse(null);
     });

@@ -18,6 +18,10 @@ Run ```npm run-script build``` inside `popup/` and `inject-script/` to build the
 
 * wss doesn't accept headers, so we need to pass it as query param and verify at Lambda function level
 
+* jwt expiration
+
+* since there are many tabs open, it may be better to just send to currently active tab and when someone accesses pages, pull data from server
+
 ## References
 
 ### background.js websocket
