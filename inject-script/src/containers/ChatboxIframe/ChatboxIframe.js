@@ -13,8 +13,9 @@ function ChatboxIframe() {
 
     useEffect(() => {
         //intialize chatboxOpen - chrome.tabs and chrome.windows is undefined in componentDidMount
-        chrome.storage.local.get('windowId', item => {
-            const windowChatboxOpenKey = 'windowChatboxOpen_' + item.windowId;
+        chrome.runtime.sendMessage({ type: 'request-window-id'}, function(res) {
+            const windowId = res.data.windowId;
+            const windowChatboxOpenKey = 'windowChatboxOpen_' + windowId;
             chrome.storage.local.get(windowChatboxOpenKey, item => {
                 setChatboxOpen(item[windowChatboxOpenKey]);
             });
@@ -75,7 +76,8 @@ if (chrome && chrome.extension) {
                         type: 'update-presence',
                         userId: message.userId,
                         url: message.url,
-                        title: message.title
+                        title: message.title,
+                        domain: message.domain
                     }
                 });
                 break;

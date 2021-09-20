@@ -10,9 +10,9 @@ let isDragging = false;
 function ChatIcon () {
     const [windowId, setWindowId] = useState(-1);
     useEffect(() => {
-        chrome.storage.local.get('windowId', item => {
-            setWindowId(item.windowId);
-        })
+        chrome.runtime.sendMessage({ type: 'request-window-id'}, function(res) {
+            setWindowId(res.data.windowId);
+        });
     });
 
     const handleStart = () => {

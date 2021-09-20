@@ -25,6 +25,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 });
 
 // when the tab url is updated
+// TODO: check if the tab is currently open tab
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete') {
         sendPresenceWebsocket(tab.url, tab.title);
@@ -42,6 +43,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 // when window focus is changed
 chrome.windows.onFocusChanged.addListener(function(windowId) {
+    console.log('onFocusChanged: ', windowId);
     if (windowId !== -1) { 
         const queryInfo = {
             windowId: windowId,
@@ -66,6 +68,7 @@ chrome.windows.onRemoved.addListener(function(windowId) {
 // when a new window is opened, clean up the storage
 // opening window is not a very frequent event
 chrome.windows.onCreated.addListener(function(windowId) {
+    console.log('new window opened: ', windowId);
     var item = {};
     item['windowChatboxOpen_' + windowId] = false;
     chrome.storage.local.set(item);
@@ -95,6 +98,7 @@ chrome.runtime.onMessageExternal.addListener(
                 sendResponse({ code: 'success' });
                 break;
             case 'window-chatbox-close':
+                console.log('window-chatbox-close', sender.tab.windowId);
                 var chatWindowOpenKey = 'windowChatboxOpen_' + sender.tab.windowId;
                 chrome.storage.local.get(chatWindowOpenKey, function(item) {
                     if (item) {
@@ -120,6 +124,9 @@ chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         console.log(request);
         switch (request.type) {
+            case 'request-window-id':
+                sendResponse({ code: 'success', data: { windowId: sender.tab.windowId } });
+                break;
             case 'auth-jwt':
                 jwt = request.data;
                 sendResponse({ code: 'success' });
@@ -147,7 +154,7 @@ chrome.runtime.onMessage.addListener(
 );
 
 function connectWebsocket() {
-    const wsHost = 'wss://io6oef1762.execute-api.us-west-2.amazonaws.com/dev/';
+    const wsHost = 'wss://2o6961o5ai.execute-api.us-west-2.amazonaws.com/dev/';
     if (websocket === null | websocket === undefined) {
         try {
             if (jwt !== null && jwt !== undefined) {
@@ -157,12 +164,14 @@ function connectWebsocket() {
                     var data = JSON.parse(event.data);
                     switch (data.type) {
                         case 'update-presence':
+                            console.log(data);
                             chrome.tabs.query({}, function(tabs) {
                                 var message = {
                                     type: 'update-presence',
                                     userId: data.userId,
                                     url: data.url,
-                                    title: data.title
+                                    title: data.title,
+                                    domain: data.domain
                                 }
                                 for (var i = 0; i < tabs.length; i++) {
                                     chrome.tabs.sendMessage(tabs[i].id, message);
@@ -219,14 +228,19 @@ function getWebsocketStatus() {
 }
 
 function sendPresenceWebsocket(url, title) {
-    url = new URL(url);
     var updatedUrl = '';
     var updatedTitle = '';
-    if ((shareMode == 'default_none' && domainAllowSet.has(url.hostname)) ||
-        (shareMode == 'default_all' && !domainDenySet.has(url.hostname))) {
-        updatedUrl = url;
-        updatedTitle = title;
+    try {
+        url = new URL(url);
+        if ((shareMode == 'default_none' && domainAllowSet.has(url.hostname)) ||
+            (shareMode == 'default_all' && !domainDenySet.has(url.hostname))) {
+            updatedUrl = url;
+            updatedTitle = title;
+        }
+    } catch (error) {
+        console.log(error);
     }
+
     refreshWebsocketConnection();
     if (websocket !== null && websocket !== undefined && websocket.readyState === WebSocket.OPEN) {
         var data = {
