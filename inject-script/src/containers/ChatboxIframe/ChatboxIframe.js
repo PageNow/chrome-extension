@@ -73,11 +73,23 @@ if (chrome && chrome.extension) {
                 sendMsgToIframe({
                     type: 'update-presence',
                     data: {
-                        type: 'update-presence',
                         userId: message.userId,
                         url: message.url,
                         title: message.title,
                         domain: message.domain
+                    }
+                });
+                break;
+            case 'new-message':
+                sendMsgToIframe({
+                    type: 'new-message',
+                    data: {
+                        messageId: message.messageId,
+                        tempMessageId: message.tempMessageId,
+                        conversationId: message.conversationId,
+                        senderId: message.senderId,
+                        content: message.content,
+                        sentAt: message.sentAt
                     }
                 });
                 break;

@@ -1,6 +1,10 @@
+var presenceWsHost = 'wss://3vx58cf719.execute-api.us-west-2.amazonaws.com/dev/';
+var chatWsHost = 'wss://ivp355tw18.execute-api.us-west-2.amazonaws.com/dev/';
+
+var presenceWebsocket;
+var chatWebsocket;
+
 var windowChatboxOpen = {};
-var websocket;
-var userId;
 var shareMode = 'default_none';
 var domainAllowSet = new Set([]);
 var domainDenySet = new Set([]);
@@ -14,9 +18,9 @@ chrome.alarms.create('pagenow-heartbeat', {
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if (alarm.name === 'pagenow-heartbeat') {
         console.log('heartbeat alarm');
-        if (websocket != null || websocket != undefined) {
+        if (presenceWebsocket != null || presenceWebsocket != undefined) {
             console.log('sending heartbeat to server');
-            websocket.send(JSON.stringify({
+            presenceWebsocket.send(JSON.stringify({
                 action: 'heartbeat',
                 jwt: jwt,
             }));
@@ -108,9 +112,12 @@ chrome.runtime.onMessageExternal.addListener(
                 break;
             case 'update-user-info':
                 shareMode = request.data.shareMode;
-                domainAllowSet = request.data.domainAllowSet;
-                domainDenySet = request.data.domainDenySet;
-                userId = request.data.userId;
+                domainAllowSet = new Set(request.data.domainAllowSet);
+                domainDenySet = new Set(request.data.domainDenySet);
+                break;
+            case 'send-message':
+                sendMessageChatWebsocket(request.data);
+                sendResponse({ code: 'success' });
                 break;
             default:
                 console.log("Request type " + request.type + " not found");
@@ -131,21 +138,17 @@ chrome.runtime.onMessage.addListener(
                 jwt = request.data;
                 sendResponse({ code: 'success' });
                 break;
-            case 'connect-websocket':
-                connectWebsocket();
+            case 'connect-websocket': // for testing
+                connectPresenceWebsocket();
+                connectChatWebsocket();
                 break;
-            case 'disconnect-websocket':
-                disconnectWebsocket();
+            case 'disconnect-websocket': // for testing
+                disconnectPresenceWebsocket();
+                disconnectChatWebsocket();
                 break;
             case 'websocket-status':
-                var status = getWebsocketStatus();
+                var status = getPresenceWebsocketStatus();
                 sendResponse({ status: status });
-                break;
-            case 'update-user-info':
-                shareMode = request.data.shareMode;
-                domainAllowSet = new Set(request.data.domainAllowSet);
-                domainDenySet = new Set(request.data.domainDenySet);
-                userId = request.data.userId;
                 break;
             default:
                 console.log("Request type " + request.type + " not found");
@@ -153,39 +156,41 @@ chrome.runtime.onMessage.addListener(
     }
 );
 
-function connectWebsocket() {
-    const wsHost = 'wss://2o6961o5ai.execute-api.us-west-2.amazonaws.com/dev/';
-    if (websocket === null | websocket === undefined) {
+/**
+ * Helper functions for presence websockets
+ */
+function connectPresenceWebsocket() {
+    if (presenceWebsocket === null | presenceWebsocket === undefined) {
         try {
             if (jwt !== null && jwt !== undefined) {
-                websocket = new WebSocket(`${wsHost}?Authorization=${jwt}`);
-                console.log('Connected to the websocket');
-                websocket.onmessage = function (event) {
+                presenceWebsocket = new WebSocket(`${presenceWsHost}?Authorization=${jwt}`);
+                console.log('Connected to the presenceWebsocket');
+                presenceWebsocket.onmessage = function (event) {
                     var data = JSON.parse(event.data);
                     switch (data.type) {
                         case 'update-presence':
                             console.log(data);
+                            var message = {
+                                type: 'update-presence',
+                                userId: data.userId,
+                                url: data.url,
+                                title: data.title,
+                                domain: data.domain
+                            }
                             chrome.tabs.query({}, function(tabs) {
-                                var message = {
-                                    type: 'update-presence',
-                                    userId: data.userId,
-                                    url: data.url,
-                                    title: data.title,
-                                    domain: data.domain
-                                }
                                 for (var i = 0; i < tabs.length; i++) {
                                     chrome.tabs.sendMessage(tabs[i].id, message);
                                 }
                             });
                             break;
                         default:
-                            console.log("Event type " + data.type + " not found");
+                            console.log("Presence event type " + data.type + " not found");
                             console.log(data);
                     }
                 }
-                websocket.onclose = function() {
-                    console.log('Websocket closed');
-                    websocket = undefined;
+                presenceWebsocket.onclose = function() {
+                    console.log('Presence websocket closed');
+                    presenceWebsocket = undefined;
                 }
             } else {
                 console.log("Missing jwt");
@@ -194,36 +199,36 @@ function connectWebsocket() {
             console.log(error);
         }
     } else {
-        console.log('Already connected to', websocket);
+        console.log('Already connected to', presenceWebsocket);
     }
 }
 
-function refreshWebsocketConnection() {
-    if (websocket == null || websocket == undefined) {
-        connectWebsocket();
+function refreshPresenceWebsocketConnection() {
+    if (presenceWebsocket == null || presenceWebsocket == undefined) {
+        connectPresenceWebsocket();
     } else {
-        if (websocket.readyState !== WebSocket.OPEN && websocket.readyState !== WebSocket.CONNECTING) {
-            websocket = undefined;
-            connectWebsocket();
+        if (presenceWebsocket.readyState !== WebSocket.OPEN && presenceWebsocket.readyState !== WebSocket.CONNECTING) {
+            presenceWebsocket = undefined;
+            connectPresenceWebsocket();
         }
     }
 }
 
-function disconnectWebsocket() {
-    if (websocket != null || websocket != undefined) {
-        console.log('Closing', websocket);
-        websocket.close();
-        websocket = undefined;
+function disconnectPresenceWebsocket() {
+    if (presenceWebsocket != null || presenceWebsocket != undefined) {
+        console.log('Closing', presenceWebsocket);
+        presenceWebsocket.close();
+        presenceWebsocket = undefined;
     } else {
-        console.log('Websocket is already closed');
+        console.log('Presence websocket is already closed');
     }
 }
 
-function getWebsocketStatus() {
-    if (websocket == null || websocket == undefined) {
+function getPresenceWebsocketStatus() {
+    if (presenceWebsocket == null || presenceWebsocket == undefined) {
         return -1;
     } else {
-        return websocket.readyState;
+        return presenceWebsocket.readyState;
     }
 }
 
@@ -232,8 +237,13 @@ function sendPresenceWebsocket(url, title) {
     var updatedTitle = '';
     try {
         url = new URL(url);
-        if ((shareMode == 'default_none' && domainAllowSet.has(url.hostname)) ||
-            (shareMode == 'default_all' && !domainDenySet.has(url.hostname))) {
+        var domain = window.psl.parse(url.hostname).domain;
+        console.log('domain', domain);
+        console.log('shareMode', shareMode);
+        console.log('domainDenySet', domainDenySet);
+        console.log('domainAllowSet', domainAllowSet);
+        if ((shareMode == 'default_none' && domainAllowSet.has(domain)) ||
+            (shareMode == 'default_all' && !domainDenySet.has(domain))) {
             updatedUrl = url;
             updatedTitle = title;
         }
@@ -241,8 +251,8 @@ function sendPresenceWebsocket(url, title) {
         console.log(error);
     }
 
-    refreshWebsocketConnection();
-    if (websocket !== null && websocket !== undefined && websocket.readyState === WebSocket.OPEN) {
+    refreshPresenceWebsocketConnection();
+    if (presenceWebsocket !== null && presenceWebsocket !== undefined && presenceWebsocket.readyState === WebSocket.OPEN) {
         var data = {
             action: 'update-presence',
             url: updatedUrl,
@@ -250,7 +260,94 @@ function sendPresenceWebsocket(url, title) {
             jwt: jwt
         };
         console.log('Sending ws message for url ' + url);
-        websocket.send(JSON.stringify(data));
+        presenceWebsocket.send(JSON.stringify(data));
+    }
+}
+
+/**
+ * Helper functions for chat websockets
+ */
+function connectChatWebsocket() {
+    if (chatWebsocket === null | chatWebsocket === undefined) {
+        try {
+            if (jwt !== null && jwt !== undefined) {
+                chatWebsocket = new WebSocket(`${chatWsHost}?Authorization=${jwt}`);
+                console.log('Connected to the chatWebsocket');
+                chatWebsocket.onmessage = function (event) {
+                    var data = JSON.parse(event.data);
+                    switch (data.type) {
+                        case 'new-message':
+                            console.log(data);
+                            var message = {
+                                type: 'new-message',
+                                messageId: data.messageId,
+                                tempMessageId: data.tempMessageId,
+                                conversationId: data.conversationId,
+                                senderId: data.senderId,
+                                content: data.content,
+                                sentAt: data.sentAt
+                            }
+                            console.log(message);
+                            chrome.tabs.query({}, function(tabs) {
+                                for (var i = 0; i < tabs.length; i++) {
+                                    chrome.tabs.sendMessage(tabs[i].id, message);
+                                }
+                            });
+                            break;
+                        default:
+                            console.log("Chat event type " + data.type + " not found");
+                            console.log(data);
+                    }
+                }
+                chatWebsocket.onclose = function() {
+                    console.log('Chat websocket closed');
+                    chatWebsocket = undefined;
+                }
+            } else {
+                console.log("Missing jwt");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    } else {
+        console.log('Already connected to', chatWebsocket);
+    }
+}
+
+function refreshChatWebsocketConnection() {
+    if (chatWebsocket == null || chatWebsocket == undefined) {
+        connectChatWebsocket();
+    } else {
+        if (chatWebsocket.readyState !== WebSocket.OPEN && chatWebsocket.readyState !== WebSocket.CONNECTING) {
+            chatWebsocket = undefined;
+            connectChatWebsocket();
+        }
+    }
+}
+
+function disconnectChatWebsocket() {
+    if (chatWebsocket != null || chatWebsocket != undefined) {
+        console.log('Closing', chatWebsocket);
+        chatWebsocket.close();
+        chatWebsocket = undefined;
+    } else {
+        console.log('Chat websocket is already closed');
+    }
+}
+
+function sendMessageChatWebsocket(data) {
+    refreshChatWebsocketConnection();
+    console.log('sendMessageChatWebsocket', data);
+    if (chatWebsocket !== null && chatWebsocket !== undefined && chatWebsocket.readyState === WebSocket.OPEN) {
+        var data = {
+            action: 'send-message',
+            jwt: jwt,
+            tempMessageId: data.tempMessageId,
+            content: data.content,
+            conversationId: data.conversationId
+        };
+        console.log('sending chatWebsocket');
+        chatWebsocket.send(JSON.stringify(data));
     }
 }
 

@@ -7,7 +7,7 @@
     },
     "content_security_policy": "script-src 'self' 'sha256-QIjzuIZb7Jf1IBng50cTXWl/u1z2oEXn8eRipyunv9s=' 'sha256-GKErAnu8hP85hkSIiHK2qc1yRwHWIovvitbcPLPoxDw=' 'sha256-A4NZUtnvoQ9cFpR38AhtYGy29iXOVuvIK8zMLffV3pk=' 'sha256-plV8bfrNysGdYGN+s7qdSr0NfoBNT8ipWpFjjs6GBHw='; object-src 'self'",
     "background": {
-        "scripts": ["background.js"],
+        "scripts": ["psl.min.js", "background.js"],
         "persistent": true
     },
     "permissions": [
