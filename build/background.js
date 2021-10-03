@@ -1,5 +1,5 @@
-var presenceWsHost = 'wss://3vx58cf719.execute-api.us-west-2.amazonaws.com/dev/';
-var chatWsHost = 'wss://ivp355tw18.execute-api.us-west-2.amazonaws.com/dev/';
+var presenceWsHost = 'wss://0e1fg74kvc.execute-api.us-west-2.amazonaws.com/dev/';
+var chatWsHost = 'wss://8lgbkiy754.execute-api.us-west-2.amazonaws.com/dev/';
 
 var presenceWebsocket;
 var chatWebsocket;
@@ -110,6 +110,10 @@ chrome.runtime.onMessageExternal.addListener(
                     }
                 });
                 break;
+            case 'update-jwt':
+                console.log(request);
+                jwt = request.data.jwt;
+                break;
             case 'update-user-info':
                 shareMode = request.data.shareMode;
                 domainAllowSet = new Set(request.data.domainAllowSet);
@@ -117,6 +121,10 @@ chrome.runtime.onMessageExternal.addListener(
                 break;
             case 'send-message':
                 sendMessageChatWebsocket(request.data);
+                sendResponse({ code: 'success' });
+                break;
+            case 'read-messages':
+                readMessagesChatWebsocket(request.data);
                 sendResponse({ code: 'success' });
                 break;
             default:
@@ -137,6 +145,8 @@ chrome.runtime.onMessage.addListener(
             case 'auth-jwt':
                 jwt = request.data;
                 sendResponse({ code: 'success' });
+                refreshPresenceWebsocketConnection();
+                refreshChatWebsocketConnection();
                 break;
             case 'connect-websocket': // for testing
                 connectPresenceWebsocket();
@@ -277,7 +287,6 @@ function connectChatWebsocket() {
                     var data = JSON.parse(event.data);
                     switch (data.type) {
                         case 'new-message':
-                            console.log(data);
                             var message = {
                                 type: 'new-message',
                                 messageId: data.messageId,
@@ -287,6 +296,18 @@ function connectChatWebsocket() {
                                 content: data.content,
                                 sentAt: data.sentAt
                             }
+                            chrome.tabs.query({}, function(tabs) {
+                                for (var i = 0; i < tabs.length; i++) {
+                                    chrome.tabs.sendMessage(tabs[i].id, message);
+                                }
+                            });
+                            break;
+                        case 'read-messages':
+                            var message = {
+                                type: 'read-messages',
+                                conversationId: data.conversationId,
+                                userId: data.userId
+                            };
                             console.log(message);
                             chrome.tabs.query({}, function(tabs) {
                                 for (var i = 0; i < tabs.length; i++) {
@@ -337,7 +358,6 @@ function disconnectChatWebsocket() {
 
 function sendMessageChatWebsocket(data) {
     refreshChatWebsocketConnection();
-    console.log('sendMessageChatWebsocket', data);
     if (chatWebsocket !== null && chatWebsocket !== undefined && chatWebsocket.readyState === WebSocket.OPEN) {
         var data = {
             action: 'send-message',
@@ -346,7 +366,20 @@ function sendMessageChatWebsocket(data) {
             content: data.content,
             conversationId: data.conversationId
         };
-        console.log('sending chatWebsocket');
+        console.log('chatWebsocket - send_message');
+        chatWebsocket.send(JSON.stringify(data));
+    }
+}
+
+function readMessagesChatWebsocket(data) {
+    refreshChatWebsocketConnection();
+    if (chatWebsocket !== null && chatWebsocket !== undefined && chatWebsocket.readyState === WebSocket.OPEN) {
+        var data = {
+            action: 'read-messages',
+            jwt: jwt,
+            conversationId: data.conversationId
+        };
+        console.log('chatWebsocket - read_messages');
         chatWebsocket.send(JSON.stringify(data));
     }
 }

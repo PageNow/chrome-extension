@@ -32,8 +32,7 @@ function ChatboxIframe() {
     
     return (
         <div class='chatbox-iframe-div'>
-            <Rnd style={{display: chatboxOpen
-                                  ? 'block' : 'none' }}
+            <Rnd style={{display: chatboxOpen ? 'block' : 'none' }}
                  className='chatbox-iframe-rnd'
                  minWidth="400" minHeight="200"
                  default={{x: 0, y: 0, width: 400, height: 500}}
@@ -90,6 +89,15 @@ if (chrome && chrome.extension) {
                         senderId: message.senderId,
                         content: message.content,
                         sentAt: message.sentAt
+                    }
+                });
+                break;
+            case 'read-messages':
+                sendMsgToIframe({
+                    type: 'read-messages',
+                    data: {
+                        conversationId: message.conversationId,
+                        userId: message.userId
                     }
                 });
                 break;
