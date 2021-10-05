@@ -1,0 +1,68 @@
+.mainDiv {
+    padding: 0 10px 0 10px;
+}
+
+.headerDiv {
+    text-align: center;
+    font-family: 'Roboto' sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 5px 0 5px 0;
+}
+
+.subheaderDiv {
+    font-size: 13px;
+    padding-bottom: 5px;
+}
+
+.nameInputDiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    padding-bottom: 5px;
+}
+
+.nameInputLeft {
+    font-size: 14px;
+    margin-right: 3px;
+}
+
+.nameInputRight {
+    font-size: 14px;
+    margin-left: 3px;
+}
+
+.dobInputDiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-bottom: 5px;
+}
+
+.select {
+    width: 31%;
+    border: 1px solid #ced4da;
+    border-radius: .2rem;
+    font-size: 14px;
+    height: 25px;
+}
+
+.genderInputDiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-bottom: 15px;
+}
+
+.genderInput {
+    width: 31%;
+}
+
+.genderLabel {
+    margin-left: 10px;
+}
+
+.saveButton {
+    width: 100%;
+}

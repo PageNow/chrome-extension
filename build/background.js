@@ -1,5 +1,5 @@
-var presenceWsHost = 'wss://0e1fg74kvc.execute-api.us-west-2.amazonaws.com/dev/';
-var chatWsHost = 'wss://8lgbkiy754.execute-api.us-west-2.amazonaws.com/dev/';
+var presenceWsHost = 'wss://8ndbkdh855.execute-api.us-west-2.amazonaws.com/dev/';
+var chatWsHost = 'wss://jlhjv9x78h.execute-api.us-west-2.amazonaws.com/dev/';
 
 var presenceWebsocket;
 var chatWebsocket;
@@ -9,6 +9,9 @@ var shareMode = 'default_none';
 var domainAllowSet = new Set([]);
 var domainDenySet = new Set([]);
 var jwt;
+
+var currUrl;
+var currDomain;
 
 chrome.alarms.create('pagenow-heartbeat', {
     delayInMinutes: 1,
@@ -33,6 +36,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete') {
         sendPresenceWebsocket(tab.url, tab.title);
+        updateCurrDomain(tab.url);
     }
 });
 
@@ -41,6 +45,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     chrome.tabs.get(activeInfo.tabId, tab => {
         if (tab) {
             sendPresenceWebsocket(tab.url, tab.title);
+            updateCurrDomain(tab.url);
         }
     });
 });
@@ -59,6 +64,7 @@ chrome.windows.onFocusChanged.addListener(function(windowId) {
         chrome.tabs.query(queryInfo, tabs => {
             if (tabs.length === 1) {
                 sendPresenceWebsocket(tabs[0].url, tabs[0].title);
+                updateCurrDomain(tabs[0].url);
             }        
         }); 
     }
@@ -118,6 +124,15 @@ chrome.runtime.onMessageExternal.addListener(
                 shareMode = request.data.shareMode;
                 domainAllowSet = new Set(request.data.domainAllowSet);
                 domainDenySet = new Set(request.data.domainDenySet);
+                break;
+            case 'get-curr-url':
+                sendResponse({
+                    code: 'success',
+                    data: {
+                        url: currUrl,
+                        domain: currDomain
+                    }
+                });
                 break;
             case 'send-message':
                 sendMessageChatWebsocket(request.data);
@@ -248,10 +263,6 @@ function sendPresenceWebsocket(url, title) {
     try {
         url = new URL(url);
         var domain = window.psl.parse(url.hostname).domain;
-        console.log('domain', domain);
-        console.log('shareMode', shareMode);
-        console.log('domainDenySet', domainDenySet);
-        console.log('domainAllowSet', domainAllowSet);
         if ((shareMode == 'default_none' && domainAllowSet.has(domain)) ||
             (shareMode == 'default_all' && !domainDenySet.has(domain))) {
             updatedUrl = url;
@@ -382,6 +393,12 @@ function readMessagesChatWebsocket(data) {
         console.log('chatWebsocket - read_messages');
         chatWebsocket.send(JSON.stringify(data));
     }
+}
+
+function updateCurrDomain(url) {
+    currUrl = url;
+    var urlObj = new URL(url);
+    currDomain = window.psl.parse(urlObj.hostname).domain;
 }
 
 // TODO: set everything to false when disconnect?

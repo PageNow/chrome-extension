@@ -1,5 +1,6 @@
 /*global chrome*/
 import React from 'react';
+import axios from 'axios';
 import { Auth } from '@aws-amplify/auth';
 import { Hub } from 'aws-amplify';
 import Spinner from 'react-bootstrap/Spinner';
@@ -16,21 +17,26 @@ import awsmobile from './aws-exports';
 import SignIn from './containers/SignIn/SignIn';
 import SignUp from './containers/SignUp/SignUp';
 import Home from './containers/Home/Home';
+import UserRegistration from './containers/UserRegistration/UserRegistration';
 import ForgotPassword from './containers/ForgotPassword/ForgotPassword';
 import ResetPassword from './containers/ResetPassword/ResetPassword';
 import styles from './App.module.css';
 import ConfirmUser from './components/ConfirmUser/ConfirmUser';
+import { USER_API_URL } from './shared/constants';
 
 class App extends React.Component {
     /* state refreshes every time you open the popup */
     state = {
         chatboxToggledOn: false,
-        authChecked: false, /* Flag for auth state checked */
         authState: null,
+        authChecked: false, /* Flag for auth state checked */
+        isUserRegistered: false, /* Flag for user registration */
         tabInfo: null,
         authMode: 'sign-up', /* sign-up, sign-in, forgot-password, reset-password, confirm-user */
         isLoading: false,
-        userInputEmail: '' /* Used to retain email input for forgot password and account confirmation */
+        userInputEmail: '', /* Used to retain email input for forgot password and account confirmation */
+        errStatus: null,
+        userInfo: null
     }
 
     componentDidMount() {
@@ -60,24 +66,45 @@ class App extends React.Component {
                     .then(session => {
                         const authState = {
                             userId: session.idToken.payload['cognito:username'],
-                            email: session.idToken.payload['email']
+                            email: session.idToken.payload['email'],
                         };
-                        this.setState({
-                            authState: authState,
-                            authChecked: true
-                        }, () => {
-                            chrome.storage.local.remove('google-auth-session');
-                            chrome.tabs.sendMessage(tabs[0].id, {
-                                type: 'auth-session',
-                                session: session
+
+                        const httpHeaders = {
+                            headers: { Authorization: `Bearer ${session.getIdToken().getJwtToken()}` }
+                        };
+                        this.setIsLoading(true);
+                        axios.get(`${USER_API_URL}/users/me`, httpHeaders)
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    authState: authState,
+                                    authChecked: true,
+                                    isUserRegistered: true,
+                                    userInfo: res
+                                }, () => {
+                                    chrome.storage.local.remove('google-auth-session');
+                                    chrome.tabs.sendMessage(tabs[0].id, {
+                                        type: 'auth-session',
+                                        session: session
+                                    });
+                                    chrome.runtime.sendMessage({
+                                        type: 'auth-jwt',
+                                        data: session.getIdToken().getJwtToken()
+                                    });
+                                });
+                                this.setIsLoading(false);
+                            })
+                            .catch(err => {
+                                this.setState({
+                                    authState: authState,
+                                    authChecked: true,
+                                    isUserRegistered: false
+                                }, () => { this.setIsLoading(false) });
                             });
-                            chrome.runtime.sendMessage({
-                                type: 'auth-jwt',
-                                data: session.getIdToken().getJwtToken()
-                            });
-                        });
                     })
                     .catch((err) => { /* User is not authenticated */
+                        console.log(err);
+                        this.setState({ errStatus: err.status });
                         chrome.storage.local.get(['google-auth-session'], item => {
                             if (item.hasOwnProperty('google-auth-session')) {
                                 const session = item['google-auth-session'];
@@ -175,7 +202,11 @@ class App extends React.Component {
     }
 
     setIsLoading = (isLoading) => {
-        this.setState({ isLoading: isLoading })
+        this.setState({ isLoading: isLoading });
+    }
+
+    setIsUserRegistered = (isUserRegistered) => {
+        this.setState({ isUserRegistered: isUserRegistered });
     }
 
     handleUserInputEmail = (event) => {
@@ -190,6 +221,15 @@ class App extends React.Component {
         this.setState({ userInputEmail: '' });
     }
 
+    getErrorStatus = () => {
+        Auth.currentAuthenticatedUser()
+            .then()
+            .catch(err => {
+                console.log(err);
+                this.setState({ errStatus: err.status })
+            });        
+    }
+
     render() {
         let popupDiv = <div></div>;
         /* TODO
@@ -198,14 +238,23 @@ class App extends React.Component {
          */
 
         if (this.state.authChecked && this.state.authState !== null) {
-            popupDiv = (
-                <Home
-                    tabId={this.state.tabInfo.id}
-                    email={this.state.authState.email}
-                    chatboxToggledOn={this.state.chatboxToggledOn}
-                    toggleChatboxHandler={this.toggleChatbox}
-                />
-            );
+            if (this.state.isUserRegistered) {
+                popupDiv = (
+                    <Home
+                        tabId={this.state.tabInfo.id}
+                        email={this.state.authState.email}
+                        chatboxToggledOn={this.state.chatboxToggledOn}
+                        toggleChatboxHandler={this.toggleChatbox}
+                        setIsLoading={this.setIsLoading}
+                    />
+                );
+            } else {
+                popupDiv = (
+                    <UserRegistration
+                        setIsLoading={this.setIsLoading}
+                    />
+                );
+            }
         } else if (this.state.authChecked && this.state.tabInfo) {
             if (this.state.tabInfo.url.startsWith('chrome://')) {
                 popupDiv = (
