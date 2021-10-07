@@ -66,3 +66,9 @@
 .saveButton {
     width: 100%;
 }
+
+.errorMsgDiv {
+    padding-top: 5px;
+    color: #DC143C;
+    font-size: 13px;
+}

@@ -13,6 +13,14 @@
     text-align: right;
 }
 
+.headerDiv {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .signOutSpan {
     color: #0074D9;
 }

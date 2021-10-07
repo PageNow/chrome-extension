@@ -16,7 +16,7 @@ class UserRegistration extends React.Component {
         dobDate: CURR_DATE,
         dobYear: CURR_YEAR,
         gender: '',
-        errorMsg: ''
+        errorMsg: 'test error message'
     }
 
     handleFirstNameInput = (event) => {
@@ -80,15 +80,23 @@ class UserRegistration extends React.Component {
                     })
                     .catch(err => {
                         console.log(err);
+                        this.setState({ errorMsg: 'Internal server error' });
                         this.props.setIsLoading(false);
                     });
             });
     }
 
     render() {
-        const monthOptions = MONTHS.map(month => <option value={month}>{ month }</option>)
-        const dateOptions = DATES.map(date => <option value={date}>{ date }</option>)
-        const yearOptions = YEARS.map(year => <option value={year}>{ year }</option>)
+        const monthOptions = MONTHS.map(month => <option value={month}>{ month }</option>);
+        const dateOptions = DATES.map(date => <option value={date}>{ date }</option>);
+        const yearOptions = YEARS.map(year => <option value={year}>{ year }</option>);
+
+        let errorMsgDiv;
+        if (this.state.errorMsg !== '') {
+            errorMsgDiv = (
+                <div className={styles.errorMsgDiv}>*{ this.state.errorMsg }</div>
+            );
+        }
 
         return (
             <div className={styles.mainDiv}>
@@ -145,7 +153,7 @@ class UserRegistration extends React.Component {
                         !(this.state.gender === 'male' || this.state.gender === 'female' || this.state.gender === 'other')}>
                     Save User Information
                 </Button>
-                <div>{ this.state.errorMsg }</div>
+                { errorMsgDiv }
             </div>
         )
     }

@@ -5,11 +5,15 @@ import { Auth } from '@aws-amplify/auth';
 import axios from 'axios';
 
 import styles from './Home.module.css';
+import buttonStyles from './ToggleButton.module.css';
 import { USER_API_URL } from '../../shared/constants';
 
 class Home extends React.Component {
     state = {
-        websocketStatus: -1
+        websocketStatus: -1,
+        currUrl: '',
+        currDomain: '',
+        userInfo: null
     }
 
     componentDidMount() {
@@ -26,32 +30,13 @@ class Home extends React.Component {
             }
         )
 
-        Auth.currentSession()
-            .then(session => {
-                return axios.get(`${USER_API_URL}/users/me`, {
-                    headers: { Authorization: `Bearer ${session.getIdToken().getJwtToken()}` }
-                });
-            })
-            .then(res => {
-                console.log(res);
-                const message = {
-                    type: 'update-user-info',
-                    data: {
-                        userId: res.data.user_id,
-                        shareMode: res.data.share_mode,
-                        domainAllowSet: res.data.domain_allow_array,
-                        domainDenySet: res.data.domain_deny_array
-                    }
-                };
-                // chrome.runtime.sendMessage(EXTENSION_ID, message);
-                chrome.runtime.sendMessage(message);
-            })
-            .catch(err => {
-                console.log(err);
+        chrome.runtime.sendMessage({ type: 'curr-domain' }, (response) => {
+            this.setState({
+                currUrl: response.data.currUrl,
+                currDomain: response.data.currDomain
             });
-    }
+        })
 
-    getUserInfo = () => {
         Auth.currentSession()
             .then(session => {
                 return axios.get(`${USER_API_URL}/users/me`, {
@@ -59,7 +44,6 @@ class Home extends React.Component {
                 });
             })
             .then(res => {
-                console.log(res);
                 const message = {
                     type: 'update-user-info',
                     data: {
@@ -71,6 +55,7 @@ class Home extends React.Component {
                 };
                 // chrome.runtime.sendMessage(EXTENSION_ID, message);
                 chrome.runtime.sendMessage(message);
+                this.setState({ userInfo: res.data });
             })
             .catch(err => {
                 console.log(err);
@@ -116,15 +101,80 @@ class Home extends React.Component {
         });
     }
 
+    addToDomainAllowArray = () => {
+
+    }
+
+    addToDomainDenyArray = () => {
+
+    }
+
     render() {
+        let currDomainDiv, toggleButtonSpan;
+        console.log(this.state.userInfo);
+        if (this.state.userInfo) {
+            if (this.state.userInfo.share_mode === 'default_none') {
+                if (this.state.userInfo.domain_allow_array.includes(this.state.currDomain)) {
+                    currDomainDiv = (
+                        <div>
+                            <strong>{ this.state.currDomain }</strong> - activity shared
+                        </div>
+                    );
+                    toggleButtonSpan = (
+                        <span>Stop sharing <strong>{ this.state.currDomain}</strong></span>
+                    );
+                } else {
+                    currDomainDiv = (
+                        <div>
+                            <strong>{ this.state.currDomain }</strong> - activity hidden
+                        </div>
+                    );
+                    toggleButtonSpan = (
+                        <span>Start sharing <strong>{ this.state.currDomain}</strong></span>
+                    );
+                }
+            } else {
+                if (this.state.userInfo.domain_deny_array.includes(this.state.currDomain)) {
+                    currDomainDiv = (
+                        <div>
+                            <strong>{ this.state.currDomain }</strong> - activity hidden
+                        </div>
+                    );
+                    toggleButtonSpan = (
+                        <span>Start sharing <strong>{ this.state.currDomain}</strong></span>
+                    );
+                } else {
+                    currDomainDiv = (
+                        <div>
+                            <strong>{ this.state.currDomain }</strong> - activity shared
+                        </div>
+                    );
+                    toggleButtonSpan = (
+                        <span>Stop sharing <strong>{ this.state.currDomain}</strong></span>
+                    );
+                }
+            }
+        }
+        
         return (
             <div className={styles.homeDiv}>
-                <div className={styles.signOutDiv}>
+                <div className={styles.headerDiv}>
+                    <span>
+                        {this.props.email}
+                    </span>
                     <span className={styles.signOutSpan} onClick={this.handleSignOut}>
                         Sign Out
                     </span>
                 </div>
-                <div>Logged in as {this.props.email}</div>
+                { currDomainDiv }
+                <div>
+                    <label className={buttonStyles.switch}>
+                        <input className={buttonStyles.toggleInput} type="checkbox" />
+                        <span className={buttonStyles.slider + ' ' + buttonStyles.round}></span>
+                    </label>
+                    { toggleButtonSpan }
+                </div>
+                
                 <Button className={styles.toggleButton}
                     variant='dark' size='sm' block={true}
                     onClick={this.props.toggleChatboxHandler}>
@@ -144,9 +194,6 @@ class Home extends React.Component {
                 <div>
                     Websocket Status: {this.state.websocketStatus}
                 </div>
-                <Button onClick={this.getUserInfo}>
-                    Get user info
-                </Button>
             </div>
         );
     }

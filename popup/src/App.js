@@ -75,12 +75,11 @@ class App extends React.Component {
                         this.setIsLoading(true);
                         axios.get(`${USER_API_URL}/users/me`, httpHeaders)
                             .then(res => {
-                                console.log(res);
                                 this.setState({
                                     authState: authState,
                                     authChecked: true,
                                     isUserRegistered: true,
-                                    userInfo: res
+                                    userInfo: res.data
                                 }, () => {
                                     chrome.storage.local.remove('google-auth-session');
                                     chrome.tabs.sendMessage(tabs[0].id, {
@@ -246,6 +245,7 @@ class App extends React.Component {
                         chatboxToggledOn={this.state.chatboxToggledOn}
                         toggleChatboxHandler={this.toggleChatbox}
                         setIsLoading={this.setIsLoading}
+                        userInfo={this.state.userInfo}
                     />
                 );
             } else {

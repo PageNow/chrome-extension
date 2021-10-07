@@ -163,6 +163,9 @@ chrome.runtime.onMessage.addListener(
                 refreshPresenceWebsocketConnection();
                 refreshChatWebsocketConnection();
                 break;
+            case 'curr-domain':
+                sendResponse({ code: 'success', data: { currDomain: currDomain, currUrl: currUrl } });
+                break;
             case 'connect-websocket': // for testing
                 connectPresenceWebsocket();
                 connectChatWebsocket();
