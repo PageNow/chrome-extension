@@ -1,4 +1,4 @@
-.chat-icon-span {
+.pagenow-chat-icon-span {
     z-index: 2147483647;
 	margin: 10px;
 	width: 32px;
@@ -14,7 +14,7 @@
 	line-height: 32px;
 }
 
-.chat-icon-span img {
+.pagenow-chat-icon-span img {
     width: 100%;
     height: 100%;
 

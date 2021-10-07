@@ -166,18 +166,6 @@ chrome.runtime.onMessage.addListener(
             case 'curr-domain':
                 sendResponse({ code: 'success', data: { currDomain: currDomain, currUrl: currUrl } });
                 break;
-            case 'connect-websocket': // for testing
-                connectPresenceWebsocket();
-                connectChatWebsocket();
-                break;
-            case 'disconnect-websocket': // for testing
-                disconnectPresenceWebsocket();
-                disconnectChatWebsocket();
-                break;
-            case 'websocket-status':
-                var status = getPresenceWebsocketStatus();
-                sendResponse({ status: status });
-                break;
             default:
                 console.log("Request type " + request.type + " not found");
         }

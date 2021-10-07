@@ -94,7 +94,7 @@ class UserRegistration extends React.Component {
         let errorMsgDiv;
         if (this.state.errorMsg !== '') {
             errorMsgDiv = (
-                <div className={styles.errorMsgDiv}>*{ this.state.errorMsg }</div>
+                <div className={styles.errorMsgDiv}>* { this.state.errorMsg }</div>
             );
         }
 
