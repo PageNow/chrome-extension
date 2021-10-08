@@ -89,3 +89,27 @@
 .slider.round:before {
     border-radius: 50%;
 }
+
+/* For toggle buttons used for chatbox/chaticon open/hide */
+
+.sliderOpen {
+    background-color: #212529;
+}
+
+.sliderOpen:before {
+    left: 4px;
+}
+
+.toggleInputClosed:checked + .sliderHiding {
+    background-color: #212529;
+}
+  
+.toggleInputClosed:focus + .sliderHiding {
+    box-shadow: 0 0 1px #212529;
+}
+  
+.toggleInputClosed:checked + .sliderHiding:before {
+    -webkit-transform: translateX(-15px);
+    -ms-transform: translateX(-15px);
+    transform: translateX(-15px);
+}

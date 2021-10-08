@@ -15,7 +15,8 @@ class Home extends React.Component {
         currDomain: '',
         userInfo: null,
         checked: false,
-        showChatIcon: null
+        showChatIcon: null,
+        chatboxOpen: false,
     }
 
     componentDidMount() {
@@ -58,10 +59,23 @@ class Home extends React.Component {
             }
         });
 
-        chrome.storage.onChanged.addListener((changes, namespace) => {
-            if ('showChatIcon' in changes) {
-                this.setState({ showChatIcon: changes.showChatIcon.newValue });
-            }
+        chrome.windows.getCurrent(window => {
+            const windowChatboxOpenKey = 'windowChatboxOpen_' + window.id;
+            chrome.storage.local.get(windowChatboxOpenKey, item => {
+                this.setState({
+                    chatboxOpen: item[windowChatboxOpenKey]
+                });
+            });
+
+            chrome.storage.onChanged.addListener((changes, namespace) => {
+                if ('showChatIcon' in changes) {
+                    this.setState({ showChatIcon: changes.showChatIcon.newValue });
+                } else if (windowChatboxOpenKey in changes) {
+                    this.setState({
+                        chatboxOpen: changes[windowChatboxOpenKey].newValue
+                    });
+                }
+            });
         });
     }
 
@@ -136,6 +150,21 @@ class Home extends React.Component {
             })
     }
 
+    /* Toggle chatbox for window */
+    toggleChatbox = () => {
+        chrome.windows.getCurrent(window => {
+            const windowChatboxOpenKey = 'windowChatboxOpen_' + window.id;
+            const updatedItem = {};
+            if (this.state.chatboxOpen) {
+                updatedItem[windowChatboxOpenKey] = false;
+                chrome.storage.local.set(updatedItem);
+            } else {
+                updatedItem[windowChatboxOpenKey] = true;
+                chrome.storage.local.set(updatedItem);
+            }
+        });
+    }
+
     toggleShowChatIcon = () => {
         chrome.storage.local.set({ showChatIcon: !this.state.showChatIcon });
     }
@@ -154,7 +183,9 @@ class Home extends React.Component {
                         </div>
                     );
                     toggleButtonSpan = (
-                        <span>Stop sharing activity on domain</span>
+                        <span className={styles.shareToggleButtonSpan}>
+                            Stop sharing activity on domain
+                        </span>
                     );
                 } else {
                     isSharing = false;
@@ -164,7 +195,9 @@ class Home extends React.Component {
                         </div>
                     );
                     toggleButtonSpan = (
-                        <span>Start sharing activity on domain</span>
+                        <span className={styles.shareToggleButtonSpan}>
+                            Start sharing activity on domain
+                        </span>
                     );
                     
                 }
@@ -177,7 +210,9 @@ class Home extends React.Component {
                         </div>
                     );
                     toggleButtonSpan = (
-                        <span>Start sharing activity on domain</span>
+                        <span className={styles.shareToggleButtonSpan}>
+                            Start sharing activity on domain
+                        </span>
                     );
                 } else {
                     isSharing = true;
@@ -187,7 +222,9 @@ class Home extends React.Component {
                         </div>
                     );
                     toggleButtonSpan = (
-                        <span>Stop sharing activity on domain</span>
+                        <span className={styles.shareToggleButtonSpan}>
+                            Stop sharing activity on domain
+                        </span>
                     );
                 }
             }
@@ -204,8 +241,8 @@ class Home extends React.Component {
                     </span>
                 </div>
                 { currDomainDiv }
-                <div className={styles.toggleDiv}>
-                    <div className={styles.toggleButtonDiv}>
+                <div className={styles.shareToggleDiv}>
+                    <div className={styles.shareToggleButtonDiv}>
                         <label className={buttonStyles.switch}>
                             <input className={`${buttonStyles.toggleInput} ${isSharing ? buttonStyles.toggleInputSharing : buttonStyles.toggleInputHiding}`}
                                 type="checkbox" onClick={this.toggleShare} checked={this.state.checked}/>
@@ -214,21 +251,32 @@ class Home extends React.Component {
                     </div>
                     { toggleButtonSpan }
                 </div>
-                
-                <Button className={styles.chatboxToggleButton}
-                    variant='dark' size='sm' block={true}
-                    onClick={this.props.toggleChatboxHandler}>
-                    <strong>
-                        {this.props.chatboxToggledOn ? "Close Chatbox" : "Open Chatbox"}
-                    </strong>
-                </Button>
 
-                <Button variant='dark' size='sm' block={true}
-                    onClick={this.toggleShowChatIcon}>
-                    <strong>
+                <div class={styles.chatboxToggleDiv}>
+                    <div className={styles.chatboxToggleButtonDiv}>
+                        <label className={buttonStyles.switch}>
+                            <input className={`${buttonStyles.toggleInput} ${this.state.chatboxOpen ? buttonStyles.toggleInputSharing : buttonStyles.toggleInputClosed}`}
+                                type="checkbox" onClick={this.toggleChatbox} checked={this.state.chatboxOpen} />
+                            <span className={`${buttonStyles.slider} ${buttonStyles.round} ${this.state.chatboxOpen ? buttonStyles.sliderOpen : buttonStyles.sliderHiding}`}></span>
+                        </label>
+                    </div>
+                    <span className={styles.chatboxToggleSpan}>
+                        { this.props.chatboxToggledOn ? "Close Chatbox" : "Open Chatbox" }
+                    </span>
+                </div>
+
+                <div className={styles.chatIconToggleDiv}>
+                    <div className={styles.chatboxToggleButtonDiv}>
+                        <label className={buttonStyles.switch}>
+                            <input className={`${buttonStyles.toggleInput} ${this.state.showChatIcon ? buttonStyles.toggleInputSharing : buttonStyles.toggleInputClosed}`}
+                                type="checkbox" onClick={this.toggleShowChatIcon} checked={this.state.showChatIcon} />
+                            <span className={`${buttonStyles.slider} ${buttonStyles.round} ${this.state.showChatIcon ? buttonStyles.sliderOpen : buttonStyles.sliderHiding}`}></span>
+                        </label>
+                    </div>
+                    <span className={styles.chatIconToggleSpan}>
                         { this.state.showChatIcon ? "Hide Chat Icon" : "Show Chat Icon" }
-                    </strong>
-                </Button>
+                    </span>
+                </div>
             </div>
         );
     }

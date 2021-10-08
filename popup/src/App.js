@@ -27,7 +27,6 @@ import { USER_API_URL } from './shared/constants';
 class App extends React.Component {
     /* state refreshes every time you open the popup */
     state = {
-        chatboxToggledOn: false,
         authState: null,
         authChecked: false, /* Flag for auth state checked */
         isUserRegistered: false, /* Flag for user registration */
@@ -183,21 +182,6 @@ class App extends React.Component {
 
     handleGoogleSignIn = () => {
         window.open('http://localhost:4200/auth/google', '_blank');
-    }
-
-    /* Toggle chatbox for window */
-    toggleChatbox = () => {
-        chrome.windows.getCurrent(window => {
-            const windowChatboxOpenKey = 'windowChatboxOpen_' + window.id;
-            const updatedItem = {};
-            if (this.state.chatboxToggledOn) {
-                updatedItem[windowChatboxOpenKey] = false;
-                chrome.storage.local.set(updatedItem);
-            } else {
-                updatedItem[windowChatboxOpenKey] = true;
-                chrome.storage.local.set(updatedItem);
-            }
-        });
     }
 
     setIsLoading = (isLoading) => {
