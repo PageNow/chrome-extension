@@ -1,5 +1,5 @@
-var presenceWsHost = 'wss://8ndbkdh855.execute-api.us-west-2.amazonaws.com/dev/';
-var chatWsHost = 'wss://jlhjv9x78h.execute-api.us-west-2.amazonaws.com/dev/';
+var presenceWsHost = 'wss://b2r5jd3ktb.execute-api.us-west-2.amazonaws.com/dev/';
+var chatWsHost = 'wss://1plqrtb5ih.execute-api.us-west-2.amazonaws.com/dev/';
 
 var presenceWebsocket;
 var chatWebsocket;
@@ -13,6 +13,9 @@ var jwt;
 var currUrl;
 var currDomain;
 
+connectPresenceWebsocket();
+connectChatWebsocket();
+
 chrome.alarms.create('pagenow-heartbeat', {
     delayInMinutes: 1,
     periodInMinutes: 1
@@ -21,7 +24,9 @@ chrome.alarms.create('pagenow-heartbeat', {
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if (alarm.name === 'pagenow-heartbeat') {
         console.log('heartbeat alarm');
-        if (presenceWebsocket != null || presenceWebsocket != undefined) {
+        refreshPresenceWebsocketConnection();
+        if (presenceWebsocket !== null && presenceWebsocket !== undefined
+                && presenceWebsocket.readyState === WebSocket.OPEN) {
             console.log('sending heartbeat to server');
             presenceWebsocket.send(JSON.stringify({
                 action: 'heartbeat',
@@ -73,24 +78,35 @@ chrome.windows.onFocusChanged.addListener(function(windowId) {
 // on window close => remove chrome storage key/value pair
 chrome.windows.onRemoved.addListener(function(windowId) {
     chrome.storage.local.remove('windowChatboxOpen_' + windowId);
+    chrome.storage.local.remove('windowChatboxWidth_' + windowId);
+    chrome.storage.local.remove('windowChatboxHeight_' + windowId);
 });
 
 // when a new window is opened, clean up the storage
 // opening window is not a very frequent event
 chrome.windows.onCreated.addListener(function(windowId) {
-    console.log('new window opened: ', windowId);
-    var item = {};
-    item['windowChatboxOpen_' + windowId] = false;
-    chrome.storage.local.set(item);
+    chrome.storage.local.set({
+        ['windowChatboxOpen_' + windowId]: false,
+        ['windowChatboxWidth_' + windowId]: '400px',
+        ['windowChatboxHeight_' + windowId]: '500px'
+    });
     // clean up unused variables
     chrome.storage.local.get(null, function(items) {
         var windowIdKeyArr = [];
         chrome.windows.getAll({}, function(windowArr) {
-            for(var i=0; i < windowArr.length; i++) {
+            for (var i = 0; i < windowArr.length; i++) {
                 windowIdKeyArr.push('windowChatboxOpen_' + windowArr[i].id);
+                windowIdKeyArr.push('windowChatboxWidth_' + windowArr[i].id);
+                windowIdKeyArr.push('windowChatboxHeight_' + windowArr[i].id);
             }
             for (var prop in items) {
                 if (prop.startsWith('windowChatboxOpen_') && 
+                        !windowIdKeyArr.includes(prop)) {
+                    chrome.storage.local.remove(prop);
+                } else if (prop.startsWith('windowChatboxWidth_') &&
+                        !windowIdKeyArr.includes(prop)) {
+                    chrome.storage.local.remove(prop);
+                } else if (prop.startsWith('windowChatboxHeight_') &&
                         !windowIdKeyArr.includes(prop)) {
                     chrome.storage.local.remove(prop);
                 }
@@ -119,6 +135,8 @@ chrome.runtime.onMessageExternal.addListener(
             case 'update-jwt':
                 console.log(request);
                 jwt = request.data.jwt;
+                refreshPresenceWebsocketConnection();
+                refreshChatWebsocketConnection();
                 break;
             case 'update-user-info':
                 shareMode = request.data.shareMode;
@@ -192,7 +210,19 @@ function connectPresenceWebsocket() {
                                 url: data.url,
                                 title: data.title,
                                 domain: data.domain
-                            }
+                            };
+                            chrome.tabs.query({}, function(tabs) {
+                                for (var i = 0; i < tabs.length; i++) {
+                                    chrome.tabs.sendMessage(tabs[i].id, message);
+                                }
+                            });
+                            break;
+                        case 'presence-timeout':
+                            console.log(data);
+                            var message = {
+                                type: 'presence-timeout',
+                                userId: data.userId
+                            };
                             chrome.tabs.query({}, function(tabs) {
                                 for (var i = 0; i < tabs.length; i++) {
                                     chrome.tabs.sendMessage(tabs[i].id, message);
@@ -220,7 +250,7 @@ function connectPresenceWebsocket() {
 }
 
 function refreshPresenceWebsocketConnection() {
-    if (presenceWebsocket == null || presenceWebsocket == undefined) {
+    if (presenceWebsocket === null || presenceWebsocket === undefined) {
         connectPresenceWebsocket();
     } else {
         if (presenceWebsocket.readyState !== WebSocket.OPEN && presenceWebsocket.readyState !== WebSocket.CONNECTING) {
@@ -388,8 +418,12 @@ function readMessagesChatWebsocket(data) {
 
 function updateCurrDomain(url) {
     currUrl = url;
-    var urlObj = new URL(url);
-    currDomain = window.psl.parse(urlObj.hostname).domain;
+    try {
+        var urlObj = new URL(url);
+        currDomain = window.psl.parse(urlObj.hostname).domain;
+    } catch {
+        currDomain = '';
+    }
 }
 
 // TODO: set everything to false when disconnect?

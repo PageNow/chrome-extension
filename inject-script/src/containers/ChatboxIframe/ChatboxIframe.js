@@ -7,36 +7,82 @@ import { Rnd } from 'react-rnd';
 import { sendMsgToIframe } from '../../utils/iframe';
 import './ChatboxIframe.css';
 
-function ChatboxIframe() {
-    const [chatboxOpen, setChatboxOpen] = useState(false);
+const minWidth = 400;
+const minHeight = 200;
+const defaultChatboxWidth = '400px';
+const defaultChatboxHeight = '500px';
+
+const ChatboxIframe = () => {
+    const [ windowId, setWindowId ] = useState(-1);
+    const [ chatboxOpen, setChatboxOpen ] = useState(false);
+    const [ chatboxWidth, setChatboxWidth ] = useState(defaultChatboxWidth);
+    const [ chatboxHeight, setChatboxHeight ] = useState(defaultChatboxHeight);
     const iframeRef = useRef();
 
     useEffect(() => {
         //intialize chatboxOpen - chrome.tabs and chrome.windows is undefined in componentDidMount
-        chrome.runtime.sendMessage({ type: 'request-window-id'}, function(res) {
-            const windowId = res.data.windowId;
-            const windowChatboxOpenKey = 'windowChatboxOpen_' + windowId;
+        if (windowId === -1) {
+            chrome.runtime.sendMessage({ type: 'request-window-id', data: 'from ChatboxIframe useEffect()' }, res => {
+                setWindowId(res.data.windowId);
+            });
+        } else {
+            const windowChatboxOpenKey = `windowChatboxOpen_${windowId}`;
+            const windowChatboxWidthKey = `windowChatboxWidth_${windowId}`;
+            const windowChatboxHeightKey = `windowChatboxHeight_${windowId}`;
+
             chrome.storage.local.get(windowChatboxOpenKey, item => {
-                setChatboxOpen(item[windowChatboxOpenKey]);
+                if (item[windowChatboxOpenKey] && item[windowChatboxOpenKey] !== chatboxOpen) {
+                    setChatboxOpen(item[windowChatboxOpenKey]);
+                }
+            });
+
+            chrome.storage.local.get(windowChatboxWidthKey, item => {
+                if (item[windowChatboxWidthKey] && item[windowChatboxWidthKey] !== chatboxWidth) {
+                    setChatboxWidth(item[windowChatboxWidthKey]);
+                }
+            });
+
+            chrome.storage.local.get(windowChatboxHeightKey, item => {
+                if (item[windowChatboxHeightKey] && item[windowChatboxHeightKey] !== chatboxHeight) {
+                    setChatboxHeight(item[windowChatboxHeightKey]);
+                }
             });
 
             chrome.storage.onChanged.addListener((changes, namespace) => {
                 if (windowChatboxOpenKey in changes) {
                     setChatboxOpen(changes[windowChatboxOpenKey].newValue);
                 }
+                if (windowChatboxWidthKey in changes) {
+                    setChatboxWidth(changes[windowChatboxWidthKey].newValue);
+                }
+                if (windowChatboxHeightKey in changes) {
+                    setChatboxHeight(changes[windowChatboxHeightKey].newValue);
+                }
             });
-        });
-    })
+        }
+    });
+
+    const handleResize = (ref) => {
+        chrome.storage.local.set({
+            [`windowChatboxWidth_${windowId}`]: ref.style.width,
+            [`windowChatboxHeight_${windowId}`]: ref.style.height
+        });        
+    };
 
     window.chatboxIframeRef = iframeRef;
     
     return (
         <div class='chatbox-iframe-div'>
-            <Rnd style={{display: chatboxOpen ? 'block' : 'none' }}
-                 className='chatbox-iframe-rnd'
-                 minWidth="400" minHeight="200"
-                 default={{x: 0, y: 0, width: 400, height: 500}}
-                 dragAxis="x">
+            <Rnd style={{ display: chatboxOpen ? 'block' : 'none' }}
+                className='chatbox-iframe-rnd'
+                minWidth={ minWidth } minHeight={ minHeight }
+                default={{ x: 0, y: 0 }}
+                size={{ width: chatboxWidth, height: chatboxHeight }}
+                dragAxis="x"
+                onResizeStop={(e, direction, ref, delta, position) => {
+                    handleResize(ref);
+                }}
+            >
                 <iframe
                     allow="autoplay"
                     allowFullScreen={true}

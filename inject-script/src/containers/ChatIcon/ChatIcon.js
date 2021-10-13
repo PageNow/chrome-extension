@@ -10,23 +10,28 @@ let isDragging = false;
 function ChatIcon () {
     const [ windowId, setWindowId ] = useState(-1);
     const [ showChatIcon, setShowChatIcon ] = useState(true);
-    useEffect(() => {
-        chrome.storage.local.get(['showChatIcon'], res => {
-            if (res.showChatIcon === undefined || res.showChatIcon === null) {
-                setShowChatIcon(true);
-            } else {
-                setShowChatIcon(res.showChatIcon);
-            }
-        });
-        chrome.runtime.sendMessage({ type: 'request-window-id'}, function(res) {
-            setWindowId(res.data.windowId);
-        });
 
-        chrome.storage.onChanged.addListener((changes, namespace) => {
-            if ('showChatIcon' in changes) {
-                setShowChatIcon(changes.showChatIcon.newValue);
-            }
-        })
+    useEffect(() => {
+        if (windowId === -1) {
+            chrome.runtime.sendMessage({ type: 'request-window-id', data: 'from ChatIcon useEffect()' }, function(res) {
+                setWindowId(res.data.windowId);
+            });
+        } else {
+            const showChatIconKey = 'showChatIcon';
+            chrome.storage.local.get([showChatIconKey], item => {
+                if (item.showChatIcon === undefined || item.showChatIcon === null) {
+                    setShowChatIcon(true);
+                } else {
+                    setShowChatIcon(item.showChatIcon);
+                }
+            });
+
+            chrome.storage.onChanged.addListener((changes, namespace) => {
+                if (showChatIconKey in changes) {
+                    setShowChatIcon(changes.showChatIcon.newValue);
+                }
+            });
+        }
     });
 
     const handleStart = () => {
