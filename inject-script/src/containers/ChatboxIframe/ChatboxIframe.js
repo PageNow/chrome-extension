@@ -125,6 +125,14 @@ if (chrome && chrome.extension) {
                     }
                 });
                 break;
+            case 'presence-timeout':
+                sendMsgToIframe({
+                    type: 'presence-timeout',
+                    data: {
+                        userId: message.userId
+                    }
+                });
+                break;
             case 'new-message':
                 sendMsgToIframe({
                     type: 'new-message',

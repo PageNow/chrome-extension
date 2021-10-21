@@ -1,5 +1,5 @@
-var presenceWsHost = 'wss://b2r5jd3ktb.execute-api.us-west-2.amazonaws.com/dev/';
-var chatWsHost = 'wss://1plqrtb5ih.execute-api.us-west-2.amazonaws.com/dev/';
+var presenceWsHost = 'wss://ojmc59z8c5.execute-api.us-west-2.amazonaws.com/dev/';
+var chatWsHost = 'wss://xamup6zxad.execute-api.us-west-2.amazonaws.com/dev/';
 
 var presenceWebsocket;
 var chatWebsocket;
@@ -39,7 +39,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 // when the tab url is updated
 // TODO: check if the tab is currently open tab
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (changeInfo.status === 'complete') {
+    if (changeInfo.status === 'complete' && tab.selected) {
         sendPresenceWebsocket(tab.url, tab.title);
         updateCurrDomain(tab.url);
     }
@@ -133,7 +133,6 @@ chrome.runtime.onMessageExternal.addListener(
                 });
                 break;
             case 'update-jwt':
-                console.log(request);
                 jwt = request.data.jwt;
                 refreshPresenceWebsocketConnection();
                 refreshChatWebsocketConnection();
@@ -142,13 +141,16 @@ chrome.runtime.onMessageExternal.addListener(
                 shareMode = request.data.shareMode;
                 domainAllowSet = new Set(request.data.domainAllowSet);
                 domainDenySet = new Set(request.data.domainDenySet);
+                if (request.data.updatePresence) {
+                    sendPresenceWebsocket(sender.tab.url, sender.tab.title);
+                }
                 break;
             case 'get-curr-url':
                 sendResponse({
                     code: 'success',
                     data: {
-                        url: currUrl,
-                        domain: currDomain
+                        url: sender.tab.url,
+                        domain: extractDomainFromUrl(sender.tab.url)
                     }
                 });
                 break;
@@ -170,7 +172,6 @@ chrome.runtime.onMessageExternal.addListener(
 // Listen for runtime messages
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
-        console.log(request);
         switch (request.type) {
             case 'request-window-id':
                 sendResponse({ code: 'success', data: { windowId: sender.tab.windowId } });
@@ -198,12 +199,10 @@ function connectPresenceWebsocket() {
         try {
             if (jwt !== null && jwt !== undefined) {
                 presenceWebsocket = new WebSocket(`${presenceWsHost}?Authorization=${jwt}`);
-                console.log('Connected to the presenceWebsocket');
                 presenceWebsocket.onmessage = function (event) {
                     var data = JSON.parse(event.data);
                     switch (data.type) {
                         case 'update-presence':
-                            console.log(data);
                             var message = {
                                 type: 'update-presence',
                                 userId: data.userId,
@@ -218,7 +217,6 @@ function connectPresenceWebsocket() {
                             });
                             break;
                         case 'presence-timeout':
-                            console.log(data);
                             var message = {
                                 type: 'presence-timeout',
                                 userId: data.userId
@@ -231,7 +229,6 @@ function connectPresenceWebsocket() {
                             break;
                         default:
                             console.log("Presence event type " + data.type + " not found");
-                            console.log(data);
                     }
                 }
                 presenceWebsocket.onclose = function() {
@@ -301,7 +298,6 @@ function sendPresenceWebsocket(url, title) {
             title: updatedTitle,
             jwt: jwt
         };
-        console.log('Sending ws message for url ' + url);
         presenceWebsocket.send(JSON.stringify(data));
     }
 }
@@ -314,7 +310,6 @@ function connectChatWebsocket() {
         try {
             if (jwt !== null && jwt !== undefined) {
                 chatWebsocket = new WebSocket(`${chatWsHost}?Authorization=${jwt}`);
-                console.log('Connected to the chatWebsocket');
                 chatWebsocket.onmessage = function (event) {
                     var data = JSON.parse(event.data);
                     switch (data.type) {
@@ -413,6 +408,15 @@ function readMessagesChatWebsocket(data) {
         };
         console.log('chatWebsocket - read_messages');
         chatWebsocket.send(JSON.stringify(data));
+    }
+}
+
+function extractDomainFromUrl(url) {
+    try {
+        var urlObj = new URL(url);
+        return window.psl.parse(urlObj.hostname).domain;
+    } catch {
+        return '';
     }
 }
 
