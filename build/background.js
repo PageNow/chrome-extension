@@ -1,5 +1,5 @@
-var presenceWsHost = 'wss://ojmc59z8c5.execute-api.us-west-2.amazonaws.com/dev/';
-var chatWsHost = 'wss://xamup6zxad.execute-api.us-west-2.amazonaws.com/dev/';
+var presenceWsHost = 'wss://nmkdru2da2.execute-api.us-west-2.amazonaws.com/dev/';
+var chatWsHost = 'wss://m0sv5478id.execute-api.us-west-2.amazonaws.com/dev/';
 
 var presenceWebsocket;
 var chatWebsocket;
@@ -184,6 +184,21 @@ chrome.runtime.onMessage.addListener(
                 break;
             case 'curr-domain':
                 sendResponse({ code: 'success', data: { currDomain: currDomain, currUrl: currUrl } });
+                break;
+            case 'update-domain-array':
+                domainAllowSet = new Set(request.data.domainAllowArray);
+                domainDenySet = new Set(request.data.domainDenyArray);
+                var message = {
+                    type: 'update-domain-array',
+                    shareMode: request.data.shareMode,
+                    domainAllowArray: request.data.domainAllowArray,
+                    domainDenyArray: request.data.domainDenyArray
+                };
+                chrome.tabs.query({}, function(tabs) {
+                    for (var i = 0; i < tabs.length; i++) {
+                        chrome.tabs.sendMessage(tabs[i].id, message);
+                    }
+                });
                 break;
             default:
                 console.log("Request type " + request.type + " not found");

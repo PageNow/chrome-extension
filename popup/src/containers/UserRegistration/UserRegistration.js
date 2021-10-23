@@ -16,7 +16,7 @@ class UserRegistration extends React.Component {
         dobDate: CURR_DATE,
         dobYear: CURR_YEAR,
         gender: '',
-        errorMsg: 'test error message'
+        errorMsg: ''
     }
 
     handleFirstNameInput = (event) => {
@@ -68,7 +68,6 @@ class UserRegistration extends React.Component {
                 };
                 const httpBody = {
                     first_name: this.state.firstNameInput,
-                    middle_name: '',
                     last_name: this.state.lastNameInput,
                     gender: this.state.gender,
                     dob: dob

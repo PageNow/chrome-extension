@@ -1,6 +1,5 @@
 /*global chrome*/
 import React from 'react';
-import Button from 'react-bootstrap/Button';
 import { Auth } from '@aws-amplify/auth';
 import axios from 'axios';
 
@@ -33,12 +32,11 @@ class Home extends React.Component {
                 })
                 .then(res => {
                     const message = {
-                        type: 'update-user-info',
+                        type: 'update-domain-array',
                         data: {
-                            userId: res.data.user_id,
                             shareMode: res.data.share_mode,
-                            domainAllowSet: res.data.domain_allow_array,
-                            domainDenySet: res.data.domain_deny_array
+                            domainAllowArray: res.data.domain_allow_array,
+                            domainDenyArray: res.data.domain_deny_array
                         }
                     };
                     chrome.runtime.sendMessage(message);
@@ -98,45 +96,38 @@ class Home extends React.Component {
     }
 
     toggleShare = () => {
-        console.log('toggle share');
-        let domain_allow_array, domain_deny_array;
+        let domain_array, share_type;
         if (this.state.userInfo.share_mode === 'default_none') {
-            domain_deny_array = this.state.userInfo.domain_deny_array;
             if (this.state.userInfo.domain_allow_array.includes(this.state.currDomain)) {
-                domain_allow_array = this.state.userInfo.domain_allow_array
+                domain_array = this.state.userInfo.domain_allow_array
                     .filter(domain => domain !== this.state.currDomain);
             } else {
-                domain_allow_array = [ ...this.state.userInfo.domain_allow_array, this.state.currDomain ];
+                domain_array = [ ...this.state.userInfo.domain_allow_array, this.state.currDomain ];
             }
+            share_type = 'allow';
         } else {
-            domain_allow_array = this.state.userInfo.domain_allow_array;
             if (this.state.userInfo.domain_deny_array.includes(this.state.currDomain)) {
-                domain_deny_array = this.state.userInfo.domain_deny_array
+                domain_array = this.state.userInfo.domain_deny_array
                     .filter(domain => domain !== this.state.currDomain);
             } else {
-                domain_deny_array = [ ...this.state.userInfo.domain_deny_array, this.state.currDomain ];
+                domain_array = [ ...this.state.userInfo.domain_deny_array, this.state.currDomain ];
             }
+            share_type = 'deny';
         }
-        const putBody = {
-            ...this.state.userInfo,
-            domain_allow_array: domain_allow_array,
-            domain_deny_array: domain_deny_array
-        }
-        
+
         Auth.currentSession()
             .then(session => {
-                return axios.put(`${USER_API_URL}/users/me`, putBody, {
+                return axios.put(`${USER_API_URL}/users/me/domain_array/${share_type}`, domain_array, {
                     headers: { Authorization: `Bearer ${session.getIdToken().getJwtToken()}` }
                 });
             })
             .then(res => {
                 const message = {
-                    type: 'update-user-info',
+                    type: 'update-domain-array',
                     data: {
-                        userId: res.data.user_id,
                         shareMode: res.data.share_mode,
-                        domainAllowSet: res.data.domain_allow_array,
-                        domainDenySet: res.data.domain_deny_array
+                        domainAllowArray: res.data.domain_allow_array,
+                        domainDenyArray: res.data.domain_deny_array
                     }
                 };
                 chrome.runtime.sendMessage(message);
@@ -170,10 +161,10 @@ class Home extends React.Component {
     }
 
     render() {
-        let currDomainDiv, toggleButtonSpan, isSharing;
-        const sharingDot = <span className={styles.dot + ' ' + styles.sharingDot}></span>
-        const hidingDot = <span className={styles.dot + ' ' + styles.hidingDot}></span>
+        let currDomainDiv, shareToggleButtonSpan, shareToggleButtonDiv, isSharing, sharingDot, hidingDot;
         if (this.state.userInfo) {
+            sharingDot = <span className={styles.dot + ' ' + styles.sharingDot}></span>;
+            hidingDot = <span className={styles.dot + ' ' + styles.hidingDot}></span>;
             if (this.state.userInfo.share_mode === 'default_none') {
                 if (this.state.userInfo.domain_allow_array.includes(this.state.currDomain)) {
                     isSharing = true;
@@ -182,7 +173,7 @@ class Home extends React.Component {
                             { sharingDot }<strong>{ this.state.currDomain }</strong>
                         </div>
                     );
-                    toggleButtonSpan = (
+                    shareToggleButtonSpan = (
                         <span className={styles.shareToggleButtonSpan}>
                             Stop sharing activity on domain
                         </span>
@@ -194,7 +185,7 @@ class Home extends React.Component {
                             { hidingDot } <strong>{ this.state.currDomain }</strong>
                         </div>
                     );
-                    toggleButtonSpan = (
+                    shareToggleButtonSpan = (
                         <span className={styles.shareToggleButtonSpan}>
                             Start sharing activity on domain
                         </span>
@@ -209,7 +200,7 @@ class Home extends React.Component {
                             { hidingDot } <strong>{ this.state.currDomain }</strong>
                         </div>
                     );
-                    toggleButtonSpan = (
+                    shareToggleButtonSpan = (
                         <span className={styles.shareToggleButtonSpan}>
                             Start sharing activity on domain
                         </span>
@@ -221,13 +212,22 @@ class Home extends React.Component {
                             { sharingDot } <strong>{ this.state.currDomain }</strong>
                         </div>
                     );
-                    toggleButtonSpan = (
+                    shareToggleButtonSpan = (
                         <span className={styles.shareToggleButtonSpan}>
                             Stop sharing activity on domain
                         </span>
                     );
                 }
             }
+            shareToggleButtonDiv = (
+                <div className={styles.shareToggleButtonDiv}>
+                    <label className={buttonStyles.switch}>
+                        <input className={`${buttonStyles.toggleInput} ${isSharing ? buttonStyles.toggleInputSharing : buttonStyles.toggleInputHiding}`}
+                            type="checkbox" onClick={this.toggleShare} checked={this.state.checked}/>
+                        <span className={`${buttonStyles.slider} ${buttonStyles.round} ${isSharing ? buttonStyles.sliderSharing : buttonStyles.sliderHiding}`}></span>
+                    </label>
+                </div>
+            );
         }
         
         return (
@@ -242,14 +242,8 @@ class Home extends React.Component {
                 </div>
                 { currDomainDiv }
                 <div className={styles.shareToggleDiv}>
-                    <div className={styles.shareToggleButtonDiv}>
-                        <label className={buttonStyles.switch}>
-                            <input className={`${buttonStyles.toggleInput} ${isSharing ? buttonStyles.toggleInputSharing : buttonStyles.toggleInputHiding}`}
-                                type="checkbox" onClick={this.toggleShare} checked={this.state.checked}/>
-                            <span className={`${buttonStyles.slider} ${buttonStyles.round} ${isSharing ? buttonStyles.sliderSharing : buttonStyles.sliderHiding}`}></span>
-                        </label>
-                    </div>
-                    { toggleButtonSpan }
+                    { shareToggleButtonDiv }
+                    { shareToggleButtonSpan }
                 </div>
 
                 <div class={styles.chatboxToggleDiv}>
@@ -276,6 +270,10 @@ class Home extends React.Component {
                     <span className={styles.chatIconToggleSpan}>
                         { this.state.showChatIcon ? "Hide Chat Icon" : "Show Chat Icon" }
                     </span>
+                </div>
+
+                <div class='warning-div'>
+                    * Please refresh the page if there is something wrong with the chatbox.
                 </div>
             </div>
         );

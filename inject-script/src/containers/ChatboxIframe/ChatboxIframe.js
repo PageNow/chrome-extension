@@ -155,6 +155,15 @@ if (chrome && chrome.extension) {
                     }
                 });
                 break;
+            case 'update-domain-array':
+                sendMsgToIframe({
+                    type: 'update-domain-array',
+                    data: {
+                        domainAllowArray: message.domainAllowArray,
+                        domainDenyArray: message.domainDenyArray
+                    }
+                });
+                break;
             default:
                 console.log('Message type ' + message.type + ' is unknown');
                 break;

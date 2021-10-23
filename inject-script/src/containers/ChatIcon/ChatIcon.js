@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Draggable from 'react-Draggable';
 
 import './ChatIcon.css';
-import iconImg from '../../logo192.png';
+import iconImg from '../../assets/PageNowIcon.png';
 
 let isDragging = false;
 

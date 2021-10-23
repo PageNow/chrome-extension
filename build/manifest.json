@@ -26,5 +26,10 @@
     ],
     "externally_connectable": {
         "matches": ["http://localhost:4200/*"]
+    },
+    "icons": {
+        "16": "PageNow_icon_16.png",
+        "48": "PageNow_icon_48.png",
+        "128": "PageNow_icon_128.png"
     }
 }
