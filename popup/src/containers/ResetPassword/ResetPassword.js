@@ -102,7 +102,7 @@ class ResetPassword extends React.Component {
                     <strong>Reset Password</strong>
                 </Button>
 
-                <AuthFooter />
+                {/* <AuthFooter /> */}
             </div>
         );
     }

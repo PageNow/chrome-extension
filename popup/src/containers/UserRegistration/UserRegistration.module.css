@@ -6,8 +6,8 @@
     text-align: center;
     font-family: 'Roboto' sans-serif;
     font-weight: 700;
-    font-size: 15px;
-    padding: 5px 0 5px 0;
+    font-size: 14px;
+    padding: 10px 0 0 0;
 }
 
 .subheaderDiv {
@@ -60,15 +60,41 @@
 }
 
 .genderLabel {
-    margin-left: 10px;
+    margin-left: 5px;
+}
+
+.genderLabel:hover {
+    cursor: pointer;
 }
 
 .saveButton {
     width: 100%;
 }
 
+.logOutDiv {
+    font-size: 13px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.logOutSpan {
+    color: #0074D9;
+}
+
+.logOutSpan:hover {
+    cursor: pointer;
+    color: #003366;
+}
+
 .errorMsgDiv {
     padding-top: 5px;
     color: #DC143C;
     font-size: 14px;
+}
+
+.ageWarningDiv {
+    color: #DC143C;
+    font-size: 14px;
+    padding: 100px 0 5px 0;
+    text-align: center;
 }

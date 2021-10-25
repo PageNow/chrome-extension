@@ -49,13 +49,13 @@ const ChatboxIframe = () => {
             });
 
             chrome.storage.onChanged.addListener((changes, namespace) => {
-                if (windowChatboxOpenKey in changes) {
+                if (changes.hasOwnProperty(windowChatboxOpenKey)) {
                     setChatboxOpen(changes[windowChatboxOpenKey].newValue);
                 }
-                if (windowChatboxWidthKey in changes) {
+                if (changes.hasOwnProperty(windowChatboxWidthKey)) {
                     setChatboxWidth(changes[windowChatboxWidthKey].newValue);
                 }
-                if (windowChatboxHeightKey in changes) {
+                if (changes.hasOwnProperty(windowChatboxHeightKey)) {
                     setChatboxHeight(changes[windowChatboxHeightKey].newValue);
                 }
             });

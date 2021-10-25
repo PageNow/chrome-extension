@@ -182,6 +182,17 @@ chrome.runtime.onMessage.addListener(
                 refreshPresenceWebsocketConnection();
                 refreshChatWebsocketConnection();
                 break;
+            case 'auth-null':
+                disconnectPresenceWebsocket();
+                disconnectChatWebsocket();
+                windowChatboxOpen = {};
+                shareMode = 'default_none';
+                domainAllowSet = new Set([]);
+                domainDenySet = new Set([]);
+                jwt = undefined;
+                currUrl = undefined;
+                currDomain = undefined;
+                break;
             case 'curr-domain':
                 sendResponse({ code: 'success', data: { currDomain: currDomain, currUrl: currUrl } });
                 break;
@@ -302,6 +313,7 @@ function sendPresenceWebsocket(url, title) {
             updatedTitle = title;
         }
     } catch (error) {
+        console.log(url, title);
         console.log(error);
     }
 
@@ -314,6 +326,7 @@ function sendPresenceWebsocket(url, title) {
             jwt: jwt
         };
         presenceWebsocket.send(JSON.stringify(data));
+        console.log("Sending presence through websocket");
     }
 }
 

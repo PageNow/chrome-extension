@@ -129,7 +129,7 @@ class SignIn extends React.Component {
                     </div>
                     <p className={authStyles.btnText}><b>Continue with google</b></p>
                 </div>
-                <AuthFooter />
+                {/* <AuthFooter /> */}
             </div>
         );
     }

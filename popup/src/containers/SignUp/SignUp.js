@@ -139,7 +139,7 @@ class SignUp extends React.Component {
                     <p className={authStyles.btnText}><b>Continue with google</b></p>
                 </div>
 
-                <AuthFooter />
+                {/* <AuthFooter /> */}
             </div>
         );
     }

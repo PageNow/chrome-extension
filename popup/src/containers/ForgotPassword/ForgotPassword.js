@@ -100,7 +100,7 @@ class ForgotPassword extends React.Component {
                     <strong>I have Verification Code!</strong>
                 </Button>
 
-                <AuthFooter />
+                {/* <AuthFooter /> */}
             </div>
         );
     }

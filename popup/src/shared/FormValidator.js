@@ -11,13 +11,13 @@ export const validateEmail = (inputStr) => {
 /* Return null if valid and warning message if invalid */
 export const validatePassword = (inputStr) => {
     if (inputStr.toUpperCase() === inputStr) {
-        return "Password must have lowercase characters.";
-    } else if (inputStr.toLowerCase() === inputStr) {
-        return "Password must have uppercase characters.";
+        return "Password must contain lowercase characters.";
     } else if (!/\d/.test(inputStr)) {
         return "Password must contain a number.";
+    } else if (!/[\^$*.[\]{}()?"!@#%&/\\,><':;|_~`]/.test(inputStr)) {
+        return "Password must contain special characters.";
     } else if (inputStr.length < 8) {
-        return "Password must have at least 8 characters.";
+        return "Password must be at least 8 characters.";
     } else {
         return null;
     }

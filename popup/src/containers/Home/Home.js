@@ -80,11 +80,13 @@ class Home extends React.Component {
     handleSignOut = () => {
         Auth.signOut()
             .then(() => {
+                // send auth-null to background.js
+                chrome.runtime.sendMessage({ type: 'auth-null' });
                 chrome.tabs.sendMessage(this.props.tabId, {
                     type: 'auth-null'
                 });
                 chrome.storage.local.remove(['google-auth-session', 'auth-jwt']);
-                /* Remove all chatbox open status */
+                // Remove all chatbox open status
                 chrome.storage.local.get(null, items => {
                     const chatboxKeys = Object.keys(items).filter(k => k.startsWith('windowChatboxOpen_'));
                     chrome.storage.local.remove(chatboxKeys);
