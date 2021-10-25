@@ -5,7 +5,7 @@ import { Auth } from '@aws-amplify/auth';
 
 import styles from './ForgotPassword.module.css';
 import authStyles from '../../shared/Auth.module.css';
-import AuthFooter from '../../components/AuthFooter/AuthFooter';
+// import AuthFooter from '../../components/AuthFooter/AuthFooter';
 import { validateEmail } from '../../shared/FormValidator';
 
 class ForgotPassword extends React.Component {

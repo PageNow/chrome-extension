@@ -90,6 +90,7 @@ class UserRegistration extends React.Component {
 
         if (!isOver13(dob)) {
             this.setState({ isOver13: false });
+            this.props.setIsLoading(false);
         } else {
             Auth.currentSession()
                 .then(session => {

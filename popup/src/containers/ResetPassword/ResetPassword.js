@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 import styles from './ResetPassword.module.css';
 import authStyles from '../../shared/Auth.module.css';
 import { validatePassword } from '../../shared/FormValidator';
-import AuthFooter from '../../components/AuthFooter/AuthFooter';
+// import AuthFooter from '../../components/AuthFooter/AuthFooter';
 
 class ResetPassword extends React.Component {
     state = {

@@ -8,7 +8,7 @@ import styles from './SignIn.module.css';
 import authStyles from '../../shared/Auth.module.css';
 import GoogleLogo from '../../g-logo.png';
 import { validateEmail } from '../../shared/FormValidator';
-import AuthFooter from '../../components/AuthFooter/AuthFooter';
+// import AuthFooter from '../../components/AuthFooter/AuthFooter';
 
 class SignIn extends React.Component {
     state = {
