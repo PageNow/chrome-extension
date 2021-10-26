@@ -26,7 +26,7 @@ const ConfirmUser = (props) => {
 
     return (
         <div className={styles.confirmUserDiv}>
-            <div className={authStyles.authHeaderDiv}>
+            <div className={authStyles.authTextHeaderDiv}>
                 <strong>Verify your account</strong>
             </div>
 

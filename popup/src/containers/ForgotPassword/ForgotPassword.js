@@ -5,7 +5,7 @@ import { Auth } from '@aws-amplify/auth';
 
 import styles from './ForgotPassword.module.css';
 import authStyles from '../../shared/Auth.module.css';
-// import AuthFooter from '../../components/AuthFooter/AuthFooter';
+import AuthFooter from '../../components/AuthFooter/AuthFooter';
 import { validateEmail } from '../../shared/FormValidator';
 
 class ForgotPassword extends React.Component {
@@ -60,7 +60,7 @@ class ForgotPassword extends React.Component {
                         &lt; Back
                     </span>
                 </div>
-                <div className={authStyles.authHeaderDiv}>
+                <div className={authStyles.authTextHeaderDiv}>
                     <strong>Forgot Password</strong>
                 </div>
 
@@ -100,7 +100,7 @@ class ForgotPassword extends React.Component {
                     <strong>I have Verification Code!</strong>
                 </Button>
 
-                {/* <AuthFooter /> */}
+                <AuthFooter />
             </div>
         );
     }

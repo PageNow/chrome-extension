@@ -1,9 +1,17 @@
-.authHeaderDiv {
+.authTextHeaderDiv {
     font-size: 15px;
     margin-bottom: 5px;
     text-align: center;
     font-family: 'Roboto' sans-serif;
     font-weight: 700;
+}
+
+.authHeaderDiv {
+    text-align: center;
+}
+
+.authHeaderImg {
+    height: 30px;
 }
 
 .warningDiv {

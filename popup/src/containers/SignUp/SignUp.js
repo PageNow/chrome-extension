@@ -7,7 +7,8 @@ import styles from './SignUp.module.css';
 import authStyles from '../../shared/Auth.module.css'
 import GoogleLogo from '../../g-logo.png';
 import { validateEmail, validatePassword } from '../../shared/FormValidator';
-// import AuthFooter from '../../components/AuthFooter/AuthFooter';
+import AuthFooter from '../../components/AuthFooter/AuthFooter';
+import PageNowLogo from '../../assets/PageNow_logo_500*118.png';
 
 class SignUp extends React.Component {
     state = {
@@ -76,7 +77,7 @@ class SignUp extends React.Component {
         return (
             <div className={styles.signUpDiv}>
                 <div className={authStyles.authHeaderDiv}>
-                    <strong>PageNow SignUp</strong>
+                    <img className={authStyles.authHeaderImg} src={PageNowLogo} alt="PageNow Logo"/>
                 </div>
 
                 <div className={styles.emailDiv}>
@@ -126,7 +127,7 @@ class SignUp extends React.Component {
                     Already have an account?
                     <span className={styles.signInSpan}
                         onClick={() => {this.props.authModeHandler('sign-in')}}>
-                        Sign in
+                        <strong>Sign in</strong>
                     </span>
                 </div>
 
@@ -139,7 +140,13 @@ class SignUp extends React.Component {
                     <p className={authStyles.btnText}><b>Continue with google</b></p>
                 </div>
 
-                {/* <AuthFooter /> */}
+                <div className={styles.termsDiv}>
+                    By signing up, you agree to our 
+                    <a className={styles.termsLink} href="https://www.pagenow.io/privacy-policy" target="_blank" rel="noreferrer"> Privacy Policy</a> and 
+                    <a className={styles.termsLink} href="https://www.pagenow.io/terms-of-service" target="_blank" rel="noreferrer"> Terms of Service</a>.
+                </div>
+
+                <AuthFooter />
             </div>
         );
     }

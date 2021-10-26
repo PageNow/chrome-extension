@@ -85,7 +85,7 @@ class Home extends React.Component {
                 chrome.tabs.sendMessage(this.props.tabId, {
                     type: 'auth-null'
                 });
-                chrome.storage.local.remove(['google-auth-session', 'auth-jwt']);
+                chrome.storage.local.remove(['google-auth-session', 'auth-jwt', 'showChatIcon']);
                 // Remove all chatbox open status
                 chrome.storage.local.get(null, items => {
                     const chatboxKeys = Object.keys(items).filter(k => k.startsWith('windowChatboxOpen_'));

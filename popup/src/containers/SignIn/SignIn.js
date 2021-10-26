@@ -8,7 +8,8 @@ import styles from './SignIn.module.css';
 import authStyles from '../../shared/Auth.module.css';
 import GoogleLogo from '../../g-logo.png';
 import { validateEmail } from '../../shared/FormValidator';
-// import AuthFooter from '../../components/AuthFooter/AuthFooter';
+import AuthFooter from '../../components/AuthFooter/AuthFooter';
+import PageNowLogo from '../../assets/PageNow_logo_500*118.png';
 
 class SignIn extends React.Component {
     state = {
@@ -74,7 +75,7 @@ class SignIn extends React.Component {
         return (
             <div className={styles.signInDiv}>
                 <div className={authStyles.authHeaderDiv}>
-                    <strong>PageNow SignIn</strong>
+                    <img className={authStyles.authHeaderImg} src={PageNowLogo} alt="PageNow Logo"/>
                 </div>
 
                 <div className={styles.emailLabelDiv}>Email</div>
@@ -117,7 +118,7 @@ class SignIn extends React.Component {
                     Need an account?
                     <span className={styles.signUpSpan}
                         onClick={() => {this.props.authModeHandler('sign-up')}}>
-                        Sign up
+                        <strong>Sign up</strong>
                     </span>
                 </div>
 
@@ -129,7 +130,7 @@ class SignIn extends React.Component {
                     </div>
                     <p className={authStyles.btnText}><b>Continue with google</b></p>
                 </div>
-                {/* <AuthFooter /> */}
+                <AuthFooter />
             </div>
         );
     }

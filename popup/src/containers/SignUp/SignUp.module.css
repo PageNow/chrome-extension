@@ -1,5 +1,5 @@
 .signUpDiv {
-    padding: 15px 20px 10px 20px;
+    padding: 10px 20px 10px 20px;
     font-size: 13px;
     display: flex;
     justify-content: center;
@@ -30,4 +30,20 @@
 .signInSpan:hover {
     cursor: pointer;
     color: #003366;
+}
+
+.termsDiv {
+    color: #878787;
+    text-align: center;
+    padding-top: 7px;
+    font-size: 12px;
+}
+
+.termsLink {
+    color: #485063;
+    text-decoration: none;
+}
+
+.termsLink:hover {
+    cursor: pointer;
 }

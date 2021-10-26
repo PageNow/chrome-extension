@@ -1,7 +1,11 @@
 .footerDiv {
-    font-size: 13px;
-    padding-top: 10px;
+    /* text-align: center;
+    position: absolute;
+    bottom: 10px;
+    width: 245px; */
     text-align: center;
+    padding-top: 10px;
+    width: 100%;
 }
 
 .linkA {
@@ -13,4 +17,9 @@
 .linkA:hover {
     cursor: pointer;
     color: #003366;
+}
+
+.footerSpan {
+    font-size: 11px;
+    color: #485063;
 }

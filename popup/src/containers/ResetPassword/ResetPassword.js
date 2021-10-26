@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 import styles from './ResetPassword.module.css';
 import authStyles from '../../shared/Auth.module.css';
 import { validatePassword } from '../../shared/FormValidator';
-// import AuthFooter from '../../components/AuthFooter/AuthFooter';
+import AuthFooter from '../../components/AuthFooter/AuthFooter';
 
 class ResetPassword extends React.Component {
     state = {
@@ -63,7 +63,7 @@ class ResetPassword extends React.Component {
                         &lt; Back
                     </span>
                 </div>
-                <div className={authStyles.authHeaderDiv}>
+                <div className={authStyles.authTextHeaderDiv}>
                     <strong>Reset password</strong>
                 </div>
 
@@ -102,7 +102,7 @@ class ResetPassword extends React.Component {
                     <strong>Reset Password</strong>
                 </Button>
 
-                {/* <AuthFooter /> */}
+                <AuthFooter />
             </div>
         );
     }
