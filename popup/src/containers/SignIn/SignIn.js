@@ -3,6 +3,7 @@ import React from 'react';
 import { Auth } from '@aws-amplify/auth';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
 
 import styles from './SignIn.module.css';
 import authStyles from '../../shared/Auth.module.css';
@@ -10,6 +11,7 @@ import GoogleLogo from '../../g-logo.png';
 import { validateEmail } from '../../shared/FormValidator';
 import AuthFooter from '../../components/AuthFooter/AuthFooter';
 import PageNowLogo from '../../assets/PageNow_logo_500*118.png';
+import { USER_API_URL } from '../../shared/constants';
 
 class SignIn extends React.Component {
     state = {
@@ -59,9 +61,17 @@ class SignIn extends React.Component {
                     type: 'auth-jwt',
                     data: session.getIdToken().getJwtToken()
                 });
+                const httpHeaders = {
+                    headers: { Authorization: `Bearer ${session.getIdToken().getJwtToken()}` }
+                };
+                return axios.get(`${USER_API_URL}/users/me`, httpHeaders);
+            })
+            .then(() => {
+                this.props.setIsUserRegistered(true);
                 this.props.setIsLoading(false);
             })
             .catch(err => {
+                console.log(err);
                 this.props.setIsLoading(false);
                 if (err.code === 'UserNotConfirmedException') {
                     this.props.authModeHandler('confirm-user');

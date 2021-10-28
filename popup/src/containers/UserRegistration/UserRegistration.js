@@ -3,11 +3,11 @@ import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { Auth } from '@aws-amplify/auth';
+import axios from 'axios';
 
 import { CURR_DATE, CURR_MONTH, CURR_YEAR, DATES, isDateValid, MONTHS,
     MONTHS_STR_TO_NUM, YEARS, isOver13 } from '../../shared/utils';
 import styles from './UserRegistration.module.css';
-import axios from 'axios';
 import { USER_API_URL } from '../../shared/constants';
 
 class UserRegistration extends React.Component {
@@ -82,7 +82,7 @@ class UserRegistration extends React.Component {
         this.props.setIsLoading(true);
         const dobMonthNum = (MONTHS_STR_TO_NUM[this.state.dobMonth] + 1) + '';
         const dob = this.state.dobYear + '-' + dobMonthNum.padStart(2, '0')
-                    + '-' + this.state.dobDate;
+                    + '-' + this.state.dobDate.toString().padStart(2, '0');
         if (!isDateValid(dob)) {
             this.errorMsg = 'Date of birth is an invalid date.';
             return;
@@ -107,6 +107,7 @@ class UserRegistration extends React.Component {
                         .then(res => {
                             console.log(res);
                             this.props.setIsLoading(false);
+                            this.props.setIsUserRegistered(true);
                         })
                         .catch(err => {
                             console.log(err);

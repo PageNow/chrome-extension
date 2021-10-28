@@ -22,7 +22,8 @@ import ForgotPassword from './containers/ForgotPassword/ForgotPassword';
 import ResetPassword from './containers/ResetPassword/ResetPassword';
 import styles from './App.module.css';
 import ConfirmUser from './components/ConfirmUser/ConfirmUser';
-import { USER_API_URL } from './shared/constants';
+import { USER_API_URL, CLIENT_URL } from './shared/constants';
+import TabWarning from './containers/TabWarning/TabWarning';
 
 class App extends React.Component {
     /* state refreshes every time you open the popup */
@@ -63,6 +64,7 @@ class App extends React.Component {
                 /* Sync auth session of popup.html with chatbox iframe */
                 Auth.currentSession()
                     .then(session => {
+                        console.log(session);
                         const authState = {
                             userId: session.idToken.payload['cognito:username'],
                             email: session.idToken.payload['email'],
@@ -102,7 +104,7 @@ class App extends React.Component {
                     })
                     .catch((err) => { /* User is not authenticated */
                         console.log(err);
-                        this.setState({ errStatus: err.status });
+                        this.setState({ errStatus: err.status, isLoading: true });
                         chrome.storage.local.get(['google-auth-session'], item => {
                             if (item.hasOwnProperty('google-auth-session')) {
                                 const session = item['google-auth-session'];
@@ -135,7 +137,7 @@ class App extends React.Component {
                                 // Make a new cognito user
                                 const cognitoUser = new CognitoUser(userData);
                                 // Attach the session to the user
-                                cognitoUser.setSignInUserSession(userSession);
+                                cognitoUser.setSignInUserSession(userSession);                                
                                 // Check to make sure it works
                                 cognitoUser.getSession((err, session) => {
                                     const authState = {
@@ -146,10 +148,26 @@ class App extends React.Component {
                                         authState: authState,
                                         authChecked: true
                                     });
+                                    const httpHeaders = {
+                                        headers: { Authorization: `Bearer ${session.getIdToken().getJwtToken()}` }
+                                    };
+                                    axios.get(`${USER_API_URL}/users/me`, httpHeaders)
+                                        .then(res => {
+                                            this.setState({
+                                                isUserRegistered: true,
+                                                userInfo: res.data,
+                                                isLoading: false
+                                            });
+                                        })
+                                        .catch(err => {
+                                            this.setState({
+                                                isUserRegistered: false
+                                            }, () => { this.setIsLoading(false) });
+                                        });
                                 });
                                 chrome.storage.local.remove('google-auth-session');
                             } else {
-                                this.setState({ authChecked: true }, () => {
+                                this.setState({ authChecked: true, isLoading: false }, () => {
                                     chrome.tabs.sendMessage(tabs[0].id, {
                                         type: 'auth-null'
                                     });
@@ -181,7 +199,7 @@ class App extends React.Component {
     }
 
     handleGoogleSignIn = () => {
-        window.open('http://localhost:4200/auth/google', '_blank');
+        window.open(`${CLIENT_URL}/auth/google`, '_blank');
     }
 
     setIsLoading = (isLoading) => {
@@ -236,22 +254,20 @@ class App extends React.Component {
                 popupDiv = (
                     <UserRegistration
                         setIsLoading={this.setIsLoading}
+                        setIsUserRegistered={this.setIsUserRegistered}
                     />
                 );
             }
         } else if (this.state.authChecked && this.state.tabInfo) {
             if (this.state.tabInfo.url.startsWith('chrome://')) {
-                popupDiv = (
-                    <div>
-                        Please Switch to a Different Tab to Sign In!
-                    </div>
-                );
+                popupDiv = <TabWarning />;
             } else if (this.state.authMode === 'sign-in') {
                 popupDiv = (
                     <SignIn
                         tabId={this.state.tabInfo.id}
                         authModeHandler={this.handleAuthModeChange}
                         setIsLoading={this.setIsLoading}
+                        setIsUserRegistered={this.setIsUserRegistered}
                         googleSignInHandler={this.handleGoogleSignIn}
                         setUserInputEmail={this.setUserInputEmail}
                     />

@@ -19,6 +19,7 @@ class Home extends React.Component {
     }
 
     componentDidMount() {
+        console.log('Home componentDidMount()');
         chrome.runtime.sendMessage({ type: 'curr-domain' }, (response) => {
             this.setState({
                 currUrl: response.data.currUrl,

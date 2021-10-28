@@ -1,5 +1,5 @@
-var presenceWsHost = 'wss://nmkdru2da2.execute-api.us-west-2.amazonaws.com/dev/';
-var chatWsHost = 'wss://m0sv5478id.execute-api.us-west-2.amazonaws.com/dev/';
+var presenceWsHost = 'wss://c36ut4t8oh.execute-api.us-west-2.amazonaws.com/dev/';
+var chatWsHost = 'wss://rlz53bbvnb.execute-api.us-west-2.amazonaws.com/dev/';
 
 var presenceWebsocket;
 var chatWebsocket;
@@ -57,7 +57,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 // when window focus is changed
 chrome.windows.onFocusChanged.addListener(function(windowId) {
-    console.log('onFocusChanged: ', windowId);
     if (windowId !== -1) { 
         const queryInfo = {
             windowId: windowId,
@@ -192,6 +191,16 @@ chrome.runtime.onMessage.addListener(
                 jwt = undefined;
                 currUrl = undefined;
                 currDomain = undefined;
+                const queryInfo = {
+                    active: true,
+                    currentWindow: true
+                };
+                chrome.tabs.query(queryInfo, tabs => {
+                    if (tabs.length === 1) {
+                        console.log('auth-null', tabs[0].id);
+                        chrome.tabs.sendMessage(tabs[0].id, { type: 'auth-null' });
+                    }        
+                }); 
                 break;
             case 'curr-domain':
                 sendResponse({ code: 'success', data: { currDomain: currDomain, currUrl: currUrl } });

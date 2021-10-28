@@ -1,0 +1,16 @@
+.mainDiv {
+    padding: 20px 20px 0 20px;
+}
+
+.headerDiv {
+    text-align: center;
+}
+
+.headerImg {
+    height: 30px;
+}
+
+.warningDiv {
+    padding-top: 100px;
+    font-size: 12px;
+}

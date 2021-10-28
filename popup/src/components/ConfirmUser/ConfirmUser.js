@@ -32,7 +32,7 @@ const ConfirmUser = (props) => {
 
             <div className={styles.confirmUserSubheaderDiv}>
                 <p>
-                    Please confirm your email by clicking the verification link sent to your email.
+                    Confirm your email by clicking the <strong>verification link sent to your email</strong>.
                 </p>
                 <p>
                     Re-open the popup window after you confirm your email and sign in again.
