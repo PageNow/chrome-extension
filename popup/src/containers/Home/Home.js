@@ -2,6 +2,7 @@
 import React from 'react';
 import { Auth } from '@aws-amplify/auth';
 import axios from 'axios';
+import Spinner from 'react-bootstrap/Spinner';
 
 import styles from './Home.module.css';
 import buttonStyles from './ToggleButton.module.css';
@@ -22,7 +23,7 @@ class Home extends React.Component {
         chrome.runtime.sendMessage({ type: 'curr-domain' }, (response) => {
             this.setState({
                 currUrl: response.data.currUrl,
-                currDomain: response.data.currDomain
+                currDomain: response.data.currDomain ? response.data.currDomain : '',
             });
             Auth.currentSession()
                 .then(session => {
@@ -74,6 +75,19 @@ class Home extends React.Component {
                     });
                 }
             });
+        });
+
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            switch (request.type) {
+                case 'update-domain':
+                    this.setState({
+                        currUrl: request.url,
+                        currDomain: request.domain ? request.domain : ''
+                    });
+                    break;
+                default:
+                    break;
+            }
         });
     }
 
@@ -163,7 +177,13 @@ class Home extends React.Component {
     }
 
     render() {
-        let currDomainDiv, shareToggleButtonSpan, shareToggleButtonDiv, isSharing, sharingDot, hidingDot;
+        let currDomainDiv, shareToggleButtonSpan, shareToggleButtonDiv, spinnerDiv;
+        let isSharing, sharingDot, hidingDot;
+        spinnerDiv = (
+            <div className={styles.spinnerDiv}>
+                <Spinner className={styles.spinner} animation="grow" variant="primary" size="sm" />
+            </div>
+        );
         if (this.state.userInfo) {
             sharingDot = <span className={styles.dot + ' ' + styles.sharingDot}></span>;
             hidingDot = <span className={styles.dot + ' ' + styles.hidingDot}></span>;
@@ -172,7 +192,9 @@ class Home extends React.Component {
                     isSharing = true;
                     currDomainDiv = (
                         <div className={styles.currDomainDiv}>
-                            { sharingDot }<strong>{ this.state.currDomain }</strong>
+                            { sharingDot }
+                            <strong>{ this.state.currDomain === '' ? '(Empty Domain)' : this.state.currDomain }
+                        </strong>
                         </div>
                     );
                     shareToggleButtonSpan = (
@@ -184,7 +206,8 @@ class Home extends React.Component {
                     isSharing = false;
                     currDomainDiv = (
                         <div className={styles.currDomainDiv}>
-                            { hidingDot } <strong>{ this.state.currDomain }</strong>
+                            { hidingDot }
+                            <strong>{ this.state.currDomain === '' ? '(Empty Domain)' : this.state.currDomain }</strong>
                         </div>
                     );
                     shareToggleButtonSpan = (
@@ -199,7 +222,8 @@ class Home extends React.Component {
                     isSharing = false;
                     currDomainDiv = (
                         <div className={styles.currDomainDiv}>
-                            { hidingDot } <strong>{ this.state.currDomain }</strong>
+                            { hidingDot }
+                            <strong>{ this.state.currDomain === '' ? '(Empty Domain)' : this.state.currDomain }</strong>
                         </div>
                     );
                     shareToggleButtonSpan = (
@@ -211,7 +235,8 @@ class Home extends React.Component {
                     isSharing = true;
                     currDomainDiv = (
                         <div className={styles.currDomainDiv}>
-                            { sharingDot } <strong>{ this.state.currDomain }</strong>
+                            { sharingDot }
+                            <strong>{ this.state.currDomain === '' ? '(Empty Domain)' : this.state.currDomain }</strong>
                         </div>
                     );
                     shareToggleButtonSpan = (
@@ -230,6 +255,7 @@ class Home extends React.Component {
                     </label>
                 </div>
             );
+            spinnerDiv = null;
         }
         
         return (
@@ -242,6 +268,7 @@ class Home extends React.Component {
                         Sign Out
                     </span>
                 </div>
+                { spinnerDiv }
                 { currDomainDiv }
                 <div className={styles.shareToggleDiv}>
                     { shareToggleButtonDiv }

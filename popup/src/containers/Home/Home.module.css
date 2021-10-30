@@ -103,3 +103,8 @@
 .warning-div {
     margin-top: 10px;
 }
+
+.spinnerDiv {
+    text-align: center;
+    height: 16px;
+}

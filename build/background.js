@@ -324,17 +324,19 @@ function getPresenceWebsocketStatus() {
 function sendPresenceWebsocket(url, title) {
     var updatedUrl = '';
     var updatedTitle = '';
-    try {
-        url = new URL(url);
-        var domain = window.psl.parse(url.hostname).domain;
-        if ((shareMode == 'default_none' && domainAllowSet.has(domain)) ||
-            (shareMode == 'default_all' && !domainDenySet.has(domain))) {
-            updatedUrl = url;
-            updatedTitle = title;
+    if (url != '') {
+        try {
+            url = new URL(url);
+            var domain = window.psl.parse(url.hostname).domain;
+            if ((shareMode == 'default_none' && domainAllowSet.has(domain)) ||
+                (shareMode == 'default_all' && !domainDenySet.has(domain))) {
+                updatedUrl = url;
+                updatedTitle = title;
+            }
+        } catch (error) {
+            console.log(url, title);
+            console.log(error);
         }
-    } catch (error) {
-        console.log(url, title);
-        console.log(error);
     }
 
     refreshPresenceWebsocketConnection();
@@ -477,6 +479,12 @@ function updateCurrDomain(url) {
     } catch {
         currDomain = '';
     }
+    // send the udpated domain and url to popup
+    chrome.runtime.sendMessage({
+        type: 'update-domain',
+        domain: currDomain,
+        url: url
+    });
 }
 
 // TODO: set everything to false when disconnect?
