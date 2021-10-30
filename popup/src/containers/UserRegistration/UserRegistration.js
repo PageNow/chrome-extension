@@ -8,7 +8,7 @@ import axios from 'axios';
 import { CURR_DATE, CURR_MONTH, CURR_YEAR, DATES, isDateValid, MONTHS,
     MONTHS_STR_TO_NUM, YEARS, isOver13 } from '../../shared/utils';
 import styles from './UserRegistration.module.css';
-import { USER_API_URL } from '../../shared/constants';
+import { USER_API_URL } from '../../shared/config';
 
 class UserRegistration extends React.Component {
     state = {

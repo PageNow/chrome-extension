@@ -1,10 +1,8 @@
 /*global chrome*/
-
-// local storage is saved per page (i think)... resets for different pages
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
-import { sendMsgToIframe } from '../../utils/iframe';
+import { sendMsgToIframe } from '../../shared/iframe';
+import { CLIENT_URL } from '../../shared/config';
 import './ChatboxIframe.css';
 
 const minWidth = 400;
@@ -91,7 +89,7 @@ const ChatboxIframe = () => {
                     title="Chatbox"
                     ref={iframeRef}
                     className="chatbox-iframe"
-                    src="http://localhost:4200"
+                    src={CLIENT_URL}
                 />     
             </Rnd>
         </div>
@@ -107,6 +105,11 @@ if (chrome && chrome.extension) {
                 sendMsgToIframe({
                     type: 'auth-session',
                     data: message.session
+                });
+                break;
+            case 'auth-google-session': // try re-routing on client
+                sendMsgToIframe({
+                    type: 'auth-google-session'
                 });
                 break;
             case 'auth-null':

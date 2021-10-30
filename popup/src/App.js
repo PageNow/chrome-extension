@@ -22,7 +22,7 @@ import ForgotPassword from './containers/ForgotPassword/ForgotPassword';
 import ResetPassword from './containers/ResetPassword/ResetPassword';
 import styles from './App.module.css';
 import ConfirmUser from './components/ConfirmUser/ConfirmUser';
-import { USER_API_URL, CLIENT_URL } from './shared/constants';
+import { USER_API_URL, CLIENT_URL } from './shared/config';
 import TabWarning from './containers/TabWarning/TabWarning';
 
 class App extends React.Component {
@@ -64,7 +64,6 @@ class App extends React.Component {
                 /* Sync auth session of popup.html with chatbox iframe */
                 Auth.currentSession()
                     .then(session => {
-                        console.log(session);
                         const authState = {
                             userId: session.idToken.payload['cognito:username'],
                             email: session.idToken.payload['email'],
@@ -103,7 +102,6 @@ class App extends React.Component {
                             });
                     })
                     .catch((err) => { /* User is not authenticated */
-                        console.log(err);
                         this.setState({ errStatus: err.status, isLoading: true });
                         chrome.storage.local.get(['google-auth-session'], item => {
                             if (item.hasOwnProperty('google-auth-session')) {
@@ -226,7 +224,6 @@ class App extends React.Component {
         Auth.currentAuthenticatedUser()
             .then()
             .catch(err => {
-                console.log(err);
                 this.setState({ errStatus: err.status })
             });        
     }
@@ -312,12 +309,6 @@ class App extends React.Component {
 
         return (
             <div className="App">
-                {/* <div>
-                    <a href="http://localhost:4200/auth" target="_blank" rel="noopener noreferrer">
-                        Click to Sign into PageNow
-                    </a>
-                </div> */}
-
                 <div className={styles.modalDiv}
                     style={{display: this.state.isLoading ? 'block': 'none'}}></div>
                 <Spinner className={styles.spinner} animation="border" variant="info"

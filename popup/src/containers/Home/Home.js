@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import styles from './Home.module.css';
 import buttonStyles from './ToggleButton.module.css';
-import { USER_API_URL } from '../../shared/constants';
+import { USER_API_URL } from '../../shared/config';
 
 class Home extends React.Component {
     state = {
@@ -19,7 +19,6 @@ class Home extends React.Component {
     }
 
     componentDidMount() {
-        console.log('Home componentDidMount()');
         chrome.runtime.sendMessage({ type: 'curr-domain' }, (response) => {
             this.setState({
                 currUrl: response.data.currUrl,
@@ -67,9 +66,9 @@ class Home extends React.Component {
             });
 
             chrome.storage.onChanged.addListener((changes, namespace) => {
-                if ('showChatIcon' in changes) {
+                if (Object.keys(changes).includes('showChatIcon')) {
                     this.setState({ showChatIcon: changes.showChatIcon.newValue });
-                } else if (windowChatboxOpenKey in changes) {
+                } else if (Object.keys(changes).includes(windowChatboxOpenKey)) {
                     this.setState({
                         chatboxOpen: changes[windowChatboxOpenKey].newValue
                     });

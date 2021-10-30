@@ -1,6 +1,7 @@
 {
     "name": "PageNow",
-    "version": "1.0",
+    "version": "0.1",
+    "description": "A Chrome extension to share online activities with friends and engage in conversations",
     "manifest_version": 2,
     "browser_action": {
         "default_popup": "popup.html"
@@ -25,7 +26,7 @@
         }
     ],
     "externally_connectable": {
-        "matches": ["http://localhost:4200/*"]
+        "matches": ["https://dev.d187lz05ifnwoz.amplifyapp.com/*"]
     },
     "icons": {
         "16": "PageNow_icon_16.png",

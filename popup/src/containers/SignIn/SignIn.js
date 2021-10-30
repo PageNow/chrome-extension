@@ -11,7 +11,7 @@ import GoogleLogo from '../../g-logo.png';
 import { validateEmail } from '../../shared/FormValidator';
 import AuthFooter from '../../components/AuthFooter/AuthFooter';
 import PageNowLogo from '../../assets/PageNow_logo_500*118.png';
-import { USER_API_URL } from '../../shared/constants';
+import { USER_API_URL } from '../../shared/config';
 
 class SignIn extends React.Component {
     state = {
@@ -53,6 +53,7 @@ class SignIn extends React.Component {
                 return Auth.currentSession();
             })
             .then(session => {
+                console.log('sending session to ', this.props.tabId);
                 chrome.tabs.sendMessage(this.props.tabId, {
                     type: 'auth-session',
                     session: session

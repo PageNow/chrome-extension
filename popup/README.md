@@ -1,3 +1,8 @@
+## Notes
+
+* google-auth => authentication in client (iframe)
+* email login => authentication in popup
+
 ## Authentication
 
 ### Problems

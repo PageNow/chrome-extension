@@ -23,11 +23,10 @@ chrome.alarms.create('pagenow-heartbeat', {
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if (alarm.name === 'pagenow-heartbeat') {
-        console.log('heartbeat alarm');
         refreshPresenceWebsocketConnection();
         if (presenceWebsocket !== null && presenceWebsocket !== undefined
                 && presenceWebsocket.readyState === WebSocket.OPEN) {
-            console.log('sending heartbeat to server');
+            console.log('pagenow-heartbeat alarm: sending heartbeat to server');
             presenceWebsocket.send(JSON.stringify({
                 action: 'heartbeat',
                 jwt: jwt,
@@ -40,8 +39,8 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 // TODO: check if the tab is currently open tab
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete' && tab.selected) {
-        sendPresenceWebsocket(tab.url, tab.title);
         updateCurrDomain(tab.url);
+        sendPresenceWebsocket(tab.url, tab.title);
     }
 });
 
@@ -49,8 +48,8 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 chrome.tabs.onActivated.addListener(function(activeInfo) {
     chrome.tabs.get(activeInfo.tabId, tab => {
         if (tab) {
-            sendPresenceWebsocket(tab.url, tab.title);
             updateCurrDomain(tab.url);
+            sendPresenceWebsocket(tab.url, tab.title);
         }
     });
 });
@@ -83,11 +82,11 @@ chrome.windows.onRemoved.addListener(function(windowId) {
 
 // when a new window is opened, clean up the storage
 // opening window is not a very frequent event
-chrome.windows.onCreated.addListener(function(windowId) {
+chrome.windows.onCreated.addListener(function(window) {
     chrome.storage.local.set({
-        ['windowChatboxOpen_' + windowId]: false,
-        ['windowChatboxWidth_' + windowId]: '400px',
-        ['windowChatboxHeight_' + windowId]: '500px'
+        ['windowChatboxOpen_' + window.id]: false,
+        ['windowChatboxWidth_' + window.id]: '400px',
+        ['windowChatboxHeight_' + window.id]: '500px'
     });
     // clean up unused variables
     chrome.storage.local.get(null, function(items) {
@@ -98,7 +97,10 @@ chrome.windows.onCreated.addListener(function(windowId) {
                 windowIdKeyArr.push('windowChatboxWidth_' + windowArr[i].id);
                 windowIdKeyArr.push('windowChatboxHeight_' + windowArr[i].id);
             }
-            for (var prop in items) {
+            var storageItemKeys = Object.keys(items);
+            var prop;
+            for (var i = 0; i < storageItemKeys.length; i++) {
+                prop = storageItemKeys[i];
                 if (prop.startsWith('windowChatboxOpen_') && 
                         !windowIdKeyArr.includes(prop)) {
                     chrome.storage.local.remove(prop);
@@ -119,8 +121,15 @@ chrome.runtime.onMessageExternal.addListener(
     function (request, sender, sendResponse) {
         switch (request.type) {
             case 'google-auth-session':
+                // google-auth-session storage item to be used by popup
                 chrome.storage.local.set({ 'google-auth-session': request.data });
                 sendResponse({ code: 'success' });
+                // send session to /auth/gate
+                chrome.tabs.query({}, function(tabs) {
+                    for (var i = 0; i < tabs.length; i++) {
+                        chrome.tabs.sendMessage(tabs[i].id, { type: 'auth-google-session' });
+                    }
+                });
                 break;
             case 'window-chatbox-close':
                 console.log('window-chatbox-close', sender.tab.windowId);
@@ -234,6 +243,7 @@ function connectPresenceWebsocket() {
         try {
             if (jwt !== null && jwt !== undefined) {
                 presenceWebsocket = new WebSocket(`${presenceWsHost}?Authorization=${jwt}`);
+                console.log('Connected to presence websocket');
                 presenceWebsocket.onmessage = function (event) {
                     var data = JSON.parse(event.data);
                     switch (data.type) {
@@ -271,7 +281,7 @@ function connectPresenceWebsocket() {
                     presenceWebsocket = undefined;
                 }
             } else {
-                console.log("Missing jwt");
+                console.log("Not authorized to connect to presence websocket");
             }
         } catch (error) {
             console.log(error);
@@ -285,7 +295,8 @@ function refreshPresenceWebsocketConnection() {
     if (presenceWebsocket === null || presenceWebsocket === undefined) {
         connectPresenceWebsocket();
     } else {
-        if (presenceWebsocket.readyState !== WebSocket.OPEN && presenceWebsocket.readyState !== WebSocket.CONNECTING) {
+        if (jwt !== null && jwt !== undefined && presenceWebsocket.readyState !== WebSocket.OPEN
+                && presenceWebsocket.readyState !== WebSocket.CONNECTING) {
             presenceWebsocket = undefined;
             connectPresenceWebsocket();
         }
@@ -335,7 +346,7 @@ function sendPresenceWebsocket(url, title) {
             jwt: jwt
         };
         presenceWebsocket.send(JSON.stringify(data));
-        console.log("Sending presence through websocket");
+        console.log("Sent presence through websocket");
     }
 }
 
@@ -347,6 +358,7 @@ function connectChatWebsocket() {
         try {
             if (jwt !== null && jwt !== undefined) {
                 chatWebsocket = new WebSocket(`${chatWsHost}?Authorization=${jwt}`);
+                console.log('Connected to chat websocket');
                 chatWebsocket.onmessage = function (event) {
                     var data = JSON.parse(event.data);
                     switch (data.type) {
@@ -389,7 +401,7 @@ function connectChatWebsocket() {
                     chatWebsocket = undefined;
                 }
             } else {
-                console.log("Missing jwt");
+                console.log("Not authorized to connect to chat websocket");
             }
         } catch (error) {
             console.log(error);
