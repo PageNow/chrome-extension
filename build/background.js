@@ -1,5 +1,5 @@
-var presenceWsHost = 'wss://c36ut4t8oh.execute-api.us-west-2.amazonaws.com/dev/';
-var chatWsHost = 'wss://rlz53bbvnb.execute-api.us-west-2.amazonaws.com/dev/';
+var presenceWsHost = 'wss://c36ut4t8oh.execute-api.us-west-2.amazonaws.com/prod/';
+var chatWsHost = 'wss://rlz53bbvnb.execute-api.us-west-2.amazonaws.com/prod/';
 
 var presenceWebsocket;
 var chatWebsocket;
@@ -16,32 +16,48 @@ var currDomain;
 connectPresenceWebsocket();
 connectChatWebsocket();
 
-chrome.alarms.create('pagenow-heartbeat', {
+// Send presence heartbeat every minute.
+// The user is considered offline if the status is not updated for 3 minutes.
+chrome.alarms.create('presence-heartbeat', {
     delayInMinutes: 1,
     periodInMinutes: 1
 });
+// Send chat heartbeat every 5 minutes.
+// AWS API Gateway websocket closes automatically if it is idle for 10 minutes.
+chrome.alarms.create('chat-heartbeat', {
+    delayInMinutes: 5,
+    periodInMinutes: 5,
+});
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
-    if (alarm.name === 'pagenow-heartbeat') {
+    if (alarm.name === 'presence-heartbeat') {
         refreshPresenceWebsocketConnection();
         if (presenceWebsocket !== null && presenceWebsocket !== undefined
                 && presenceWebsocket.readyState === WebSocket.OPEN) {
-            console.log('pagenow-heartbeat alarm: sending heartbeat to server');
             presenceWebsocket.send(JSON.stringify({
-                action: 'heartbeat',
-                jwt: jwt,
+                action: 'heartbeat'
+            }));
+        }
+    } else if (alarm.name === 'chat-heartbeat') {
+        refreshChatWebsocketConnection();
+        if (chatWebsocket !== null && chatWebsocket !== undefined
+                && chatWebsocket.readyState === WebSocket.OPEN) {
+            chatWebsocket.send(JSON.stringify({
+                action: 'heartbeat'
             }));
         }
     }
 });
 
 // when the tab url is updated
-// TODO: check if the tab is currently open tab
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (changeInfo.status === 'complete' && tab.selected) {
-        updateCurrDomain(tab.url);
-        sendPresenceWebsocket(tab.url, tab.title);
-    }
+    chrome.windows.get(tab.windowId, function(window) {
+        // check if the tab is highlighed and the window is focused
+        if (changeInfo.status === 'complete' && tab.highlighted && window.focused) {
+            updateCurrDomain(tab.url);
+            sendPresenceWebsocket(tab.url, tab.title);
+        }
+    });
 });
 
 // when the tab on a window is changed
@@ -132,7 +148,6 @@ chrome.runtime.onMessageExternal.addListener(
                 });
                 break;
             case 'window-chatbox-close':
-                console.log('window-chatbox-close', sender.tab.windowId);
                 var chatWindowOpenKey = 'windowChatboxOpen_' + sender.tab.windowId;
                 chrome.storage.local.get(chatWindowOpenKey, function(item) {
                     if (item) {
@@ -206,7 +221,6 @@ chrome.runtime.onMessage.addListener(
                 };
                 chrome.tabs.query(queryInfo, tabs => {
                     if (tabs.length === 1) {
-                        console.log('auth-null', tabs[0].id);
                         chrome.tabs.sendMessage(tabs[0].id, { type: 'auth-null' });
                     }        
                 }); 
@@ -344,11 +358,9 @@ function sendPresenceWebsocket(url, title) {
         var data = {
             action: 'update-presence',
             url: updatedUrl,
-            title: updatedTitle,
-            jwt: jwt
+            title: updatedTitle
         };
         presenceWebsocket.send(JSON.stringify(data));
-        console.log("Sent presence through websocket");
     }
 }
 
@@ -386,7 +398,6 @@ function connectChatWebsocket() {
                                 conversationId: data.conversationId,
                                 userId: data.userId
                             };
-                            console.log(message);
                             chrome.tabs.query({}, function(tabs) {
                                 for (var i = 0; i < tabs.length; i++) {
                                     chrome.tabs.sendMessage(tabs[i].id, message);
@@ -439,12 +450,10 @@ function sendMessageChatWebsocket(data) {
     if (chatWebsocket !== null && chatWebsocket !== undefined && chatWebsocket.readyState === WebSocket.OPEN) {
         var data = {
             action: 'send-message',
-            jwt: jwt,
             tempMessageId: data.tempMessageId,
             content: data.content,
             conversationId: data.conversationId
         };
-        console.log('chatWebsocket - send_message');
         chatWebsocket.send(JSON.stringify(data));
     }
 }
@@ -454,10 +463,8 @@ function readMessagesChatWebsocket(data) {
     if (chatWebsocket !== null && chatWebsocket !== undefined && chatWebsocket.readyState === WebSocket.OPEN) {
         var data = {
             action: 'read-messages',
-            jwt: jwt,
             conversationId: data.conversationId
         };
-        console.log('chatWebsocket - read_messages');
         chatWebsocket.send(JSON.stringify(data));
     }
 }

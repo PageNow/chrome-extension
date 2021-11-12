@@ -22,6 +22,13 @@ Run ```npm run-script build``` inside `popup/` and `inject-script/` to build the
 
 * since there are many tabs open, it may be better to just send to currently active tab and when someone accesses pages, pull data from server
 
+## Chrome Store Upload
+
+* Update `presenceWsHost` and `chatWsHost` in `background.js`.
+* Update `externally_connectable` in `manifest.json`.
+* Update `CLIENT_URL` in `inject-script/src/shared/config.js`.
+* Update `USER_API_URL`, `CLIENT_URL` in `popup/src/shared/config.js`.
+
 ## References
 
 ### background.js websocket
