@@ -1,26 +1,25 @@
-# chrome-extension
-Chrome extension code.
+# PageNow chrome extension
 
-With javascript injection, we create iframe that hosts chatbox.
+## Overview
 
-* Popup contains the code for popup.html
-* Inject-script contains the code that is injected by the chrome extension.
+Using javascript injection, we create iframe that hosts chatbox.
+
+* `popup/` contains the code for popup.html
+* `inject-script/` contains the code that is injected by the chrome extension.
 
 ## Build
 
-Popup and injection scripts are built into `build/`. `build/` is uploaded to Chrome.
+Popup and injection scripts must be built into `build/` to be uploaded to Chrome.
 
 Run ```npm run-script build``` inside `popup/` and `inject-script/` to build the extension.
 
 ## Notes
 
-* Note that Google accounts sign-in cannot happen in an iframe due to Google's policy. Thus, we need to set up the authentication in popup.html.
+* Google accounts sign-in is forbidden in an iframe due to Google's policy. It is also forbidden in Chrome extension popup. Thus, we open a new tab upon Google authentication and sync across the web and extension.
 
-* wss doesn't accept headers, so we need to pass it as query param and verify at Lambda function level
+* Websocket (wss) doesn't accept headers, so we need to pass it as query param and verify at Lambda function level.
 
-* jwt expiration
-
-* since there are many tabs open, it may be better to just send to currently active tab and when someone accesses pages, pull data from server
+* We get jwt using Amplify, but background.js does not use Amplify. Thus, we refresh jwt as frequently as possible to prevent jwt from being expired.
 
 ## Chrome Store Upload
 
