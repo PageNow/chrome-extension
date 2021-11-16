@@ -6,7 +6,7 @@ import Spinner from 'react-bootstrap/Spinner';
 
 import styles from './Home.module.css';
 import buttonStyles from './ToggleButton.module.css';
-import { USER_API_URL } from '../../shared/config';
+import { USER_API_URL, PRESENCE_API_URL } from '../../shared/config';
 
 class Home extends React.Component {
     state = {
@@ -17,9 +17,11 @@ class Home extends React.Component {
         checked: false,
         showChatIcon: null,
         chatboxOpen: false,
+        onlineFriendCnt: null
     }
 
     componentDidMount() {
+        // get the domain of the current page that pop is opened at
         chrome.runtime.sendMessage({ type: 'curr-domain' }, (response) => {
             this.setState({
                 currUrl: response.data.currUrl,
@@ -32,6 +34,7 @@ class Home extends React.Component {
                     });
                 })
                 .then(res => {
+                    // update domainAllowArray and domainDenyArray frequently for privacy
                     const message = {
                         type: 'update-domain-array',
                         data: {
@@ -50,6 +53,7 @@ class Home extends React.Component {
                 });
         });
 
+        // for toggling 'show chat icon' option
         chrome.storage.local.get(['showChatIcon'], res => {
             if (res.showChatIcon === undefined || res.showChatIcon === null) {
                 this.setState({ showChatIcon: true });
@@ -58,6 +62,7 @@ class Home extends React.Component {
             }
         });
 
+        // for toggling 'open window chatbox' option
         chrome.windows.getCurrent(window => {
             const windowChatboxOpenKey = 'windowChatboxOpen_' + window.id;
             chrome.storage.local.get(windowChatboxOpenKey, item => {
@@ -77,6 +82,7 @@ class Home extends React.Component {
             });
         });
 
+        // since current domain update is asynchronous, listen to any updates
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             switch (request.type) {
                 case 'update-domain':
@@ -89,6 +95,9 @@ class Home extends React.Component {
                     break;
             }
         });
+
+        // get the number of friends online to display on popup
+        this.getOnlineFriendsCnt();
     }
 
     handleSignOut = () => {
@@ -176,9 +185,25 @@ class Home extends React.Component {
         chrome.storage.local.set({ showChatIcon: !this.state.showChatIcon });
     }
 
+    getOnlineFriendsCnt = () => {
+        Auth.currentSession()
+            .then(session => {
+                return axios.get(`${PRESENCE_API_URL}/presence`, {
+                    headers: { Authorization: session.getIdToken().getJwtToken() }
+                });
+            })
+            .then(res => {
+                console.log(res.data);
+                this.setState({
+                    onlineFriendCnt: res.data.presenceArr.filter(x => x.page !== null).length
+                });
+            })
+    }
+
     render() {
         let currDomainDiv, shareToggleButtonSpan, shareToggleButtonDiv, spinnerDiv;
-        let isSharing, sharingDot, hidingDot;
+        let isSharing, sharingDot, hidingDot; // display whether the domain is shared or not
+        let onlineFriendCntDiv;
         spinnerDiv = (
             <div className={styles.spinnerDiv}>
                 <Spinner className={styles.spinner} animation="grow" variant="primary" size="sm" />
@@ -257,6 +282,24 @@ class Home extends React.Component {
             );
             spinnerDiv = null;
         }
+
+        let chatIconPositionSpan;
+        if (this.state.showChatIcon) {
+            chatIconPositionSpan = (
+                <span className={styles.chatIconPositionSpan}>
+                    (Bottom Left)
+                </span>
+            );
+        }
+
+        // display the number of online friends only if any
+        if (this.state.onlineFriendCnt !== null && this.state.onlineFriendCnt > 0) {
+            onlineFriendCntDiv = (
+                <div className={styles.onlineFriendsCnt}>
+                    <i>Number of friends online: <strong>{ this.state.onlineFriendCnt }</strong></i>
+                </div>
+            )
+        }
         
         return (
             <div className={styles.homeDiv}>
@@ -269,6 +312,7 @@ class Home extends React.Component {
                     </span>
                 </div>
                 { spinnerDiv }
+                { onlineFriendCntDiv }
                 { currDomainDiv }
                 <div className={styles.shareToggleDiv}>
                     { shareToggleButtonDiv }
@@ -299,10 +343,11 @@ class Home extends React.Component {
                     <span className={styles.chatIconToggleSpan}>
                         { this.state.showChatIcon ? "Hide Chat Icon" : "Show Chat Icon" }
                     </span>
+                    { chatIconPositionSpan }
                 </div>
 
-                <div class='warning-div'>
-                    * Please refresh the page if there is something wrong with the chatbox.
+                <div>
+                    * Please <strong>refresh the page</strong> if there is something wrong with the chatbox.
                 </div>
             </div>
         );

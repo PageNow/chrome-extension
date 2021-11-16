@@ -22,11 +22,9 @@ Object.keys(MONTHS_NUM_TO_STR).forEach(key => {
 export const MONTHS_STR_TO_NUM = monthsStrNumMap;
 
 export const isOver13 = (bdayStr) => {
-    console.log(bdayStr);
     const currDate = moment();
     const bdayDate = moment(bdayStr);
     const years = currDate.diff(bdayDate, 'year');
-    console.log(years);
     if (years >= 13) {
         return true;
     } else {

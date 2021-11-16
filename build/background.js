@@ -13,24 +13,40 @@ var jwt;
 var currUrl;
 var currDomain;
 
+var notificationCnt = 0;
+var unreadConversationCnt = 0;
+
 connectPresenceWebsocket();
 connectChatWebsocket();
 
+/**
+ * Set up chrome extension alarms
+ */
+var PRESENCE_HEARTBEAT = 'presence-heartbeat';
+var CHAT_HEARTBEAT = 'chat-heartbeat';
+var NOTIFICATION_POLL = 'notification-poll'
+
 // Send presence heartbeat every minute.
 // The user is considered offline if the status is not updated for 3 minutes.
-chrome.alarms.create('presence-heartbeat', {
+chrome.alarms.create(PRESENCE_HEARTBEAT, {
     delayInMinutes: 1,
     periodInMinutes: 1
 });
 // Send chat heartbeat every 5 minutes.
 // AWS API Gateway websocket closes automatically if it is idle for 10 minutes.
-chrome.alarms.create('chat-heartbeat', {
+chrome.alarms.create(CHAT_HEARTBEAT, {
     delayInMinutes: 5,
     periodInMinutes: 5,
 });
+// Poll notifications and unread messages every 3 minutes
+// to set extension badge text
+chrome.alarms.create(NOTIFICATION_POLL, {
+    delayInMinutes: 3,
+    periodInMinutes: 3
+});
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
-    if (alarm.name === 'presence-heartbeat') {
+    if (alarm.name === PRESENCE_HEARTBEAT) {
         refreshPresenceWebsocketConnection();
         if (presenceWebsocket !== null && presenceWebsocket !== undefined
                 && presenceWebsocket.readyState === WebSocket.OPEN) {
@@ -38,7 +54,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
                 action: 'heartbeat'
             }));
         }
-    } else if (alarm.name === 'chat-heartbeat') {
+    } else if (alarm.name === CHAT_HEARTBEAT) {
         refreshChatWebsocketConnection();
         if (chatWebsocket !== null && chatWebsocket !== undefined
                 && chatWebsocket.readyState === WebSocket.OPEN) {
@@ -46,6 +62,13 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
                 action: 'heartbeat'
             }));
         }
+    } else if (alarm.name === NOTIFICATION_POLL) {
+        // get number of notificaionts by sending message to
+        // content script and getting response
+        getFriendRequests();
+        // get number of unread messagges by sending message to
+        // content script and getting response
+        getUnreadMessages();
     }
 });
 
@@ -56,6 +79,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         if (changeInfo.status === 'complete' && tab.highlighted && window.focused) {
             updateCurrDomain(tab.url);
             sendPresenceWebsocket(tab.url, tab.title);
+            refreshChatWebsocketConnection();
         }
     });
 });
@@ -66,6 +90,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
         if (tab) {
             updateCurrDomain(tab.url);
             sendPresenceWebsocket(tab.url, tab.title);
+            refreshChatWebsocketConnection();
         }
     });
 });
@@ -82,8 +107,9 @@ chrome.windows.onFocusChanged.addListener(function(windowId) {
         };
         chrome.tabs.query(queryInfo, tabs => {
             if (tabs.length === 1) {
-                sendPresenceWebsocket(tabs[0].url, tabs[0].title);
                 updateCurrDomain(tabs[0].url);
+                sendPresenceWebsocket(tabs[0].url, tabs[0].title);
+                refreshChatWebsocketConnection();
             }        
         }); 
     }
@@ -132,10 +158,13 @@ chrome.windows.onCreated.addListener(function(window) {
     });
 });
 
-//Listen for incoming external messages.
+/**
+ * Chat client message listener
+ */
 chrome.runtime.onMessageExternal.addListener(
     function (request, sender, sendResponse) {
         switch (request.type) {
+            // to sync extension auth with chat client auth on google sign in
             case 'google-auth-session':
                 // google-auth-session storage item to be used by popup
                 chrome.storage.local.set({ 'google-auth-session': request.data });
@@ -147,6 +176,7 @@ chrome.runtime.onMessageExternal.addListener(
                     }
                 });
                 break;
+            // when user presses 'x' on chatbox
             case 'window-chatbox-close':
                 var chatWindowOpenKey = 'windowChatboxOpen_' + sender.tab.windowId;
                 chrome.storage.local.get(chatWindowOpenKey, function(item) {
@@ -155,11 +185,13 @@ chrome.runtime.onMessageExternal.addListener(
                     }
                 });
                 break;
+            // update jwt token
             case 'update-jwt':
                 jwt = request.data.jwt;
                 refreshPresenceWebsocketConnection();
                 refreshChatWebsocketConnection();
                 break;
+            // update the domains allowed or denied and the sharing mode
             case 'update-user-info':
                 shareMode = request.data.shareMode;
                 domainAllowSet = new Set(request.data.domainAllowSet);
@@ -168,6 +200,7 @@ chrome.runtime.onMessageExternal.addListener(
                     sendPresenceWebsocket(sender.tab.url, sender.tab.title);
                 }
                 break;
+            // get the url of the current tab user is on
             case 'get-curr-url':
                 sendResponse({
                     code: 'success',
@@ -177,12 +210,26 @@ chrome.runtime.onMessageExternal.addListener(
                     }
                 });
                 break;
+            // send chat message through the chat functionality
             case 'send-message':
                 sendMessageChatWebsocket(request.data);
                 sendResponse({ code: 'success' });
                 break;
+            // read chat message
             case 'read-messages':
                 readMessagesChatWebsocket(request.data);
+                sendResponse({ code: 'success' });
+                break;
+            // update the number of notifications
+            case 'update-notification-cnt':
+                notificationCnt = request.data.notificationCnt;
+                updateBadgeText();
+                sendResponse({ code: 'success' });
+                break;
+            // update the number of unread conversations
+            case 'update-unread-conversation-cnt':
+                unreadConversationCnt = request.data.unreadConversationCnt;
+                updateBadgeText();
                 sendResponse({ code: 'success' });
                 break;
             default:
@@ -192,19 +239,24 @@ chrome.runtime.onMessageExternal.addListener(
     }
 );
 
-// Listen for runtime messages
+/**
+ * Popup message listener
+ */
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         switch (request.type) {
+            // return the window id of the popup as response
             case 'request-window-id':
                 sendResponse({ code: 'success', data: { windowId: sender.tab.windowId } });
                 break;
+            // for popup sign in, get jwt
             case 'auth-jwt':
                 jwt = request.data;
                 sendResponse({ code: 'success' });
                 refreshPresenceWebsocketConnection();
                 refreshChatWebsocketConnection();
                 break;
+            // sign out
             case 'auth-null':
                 disconnectPresenceWebsocket();
                 disconnectChatWebsocket();
@@ -219,6 +271,7 @@ chrome.runtime.onMessage.addListener(
                     active: true,
                     currentWindow: true
                 };
+                // sign out of clients in all tabs and close them
                 chrome.tabs.query(queryInfo, tabs => {
                     if (tabs.length === 1) {
                         chrome.tabs.sendMessage(tabs[0].id, { type: 'auth-null' });
@@ -228,6 +281,7 @@ chrome.runtime.onMessage.addListener(
             case 'curr-domain':
                 sendResponse({ code: 'success', data: { currDomain: currDomain, currUrl: currUrl } });
                 break;
+            // update domain array if information is changed on the popup
             case 'update-domain-array':
                 domainAllowSet = new Set(request.data.domainAllowArray);
                 domainDenySet = new Set(request.data.domainDenyArray);
@@ -342,6 +396,7 @@ function sendPresenceWebsocket(url, title) {
         try {
             url = new URL(url);
             var domain = window.psl.parse(url.hostname).domain;
+            // *** ONLY the urls of domains ALLOWED to be shared are sent to the backend ***
             if ((shareMode == 'default_none' && domainAllowSet.has(domain)) ||
                 (shareMode == 'default_all' && !domainDenySet.has(domain))) {
                 updatedUrl = url;
@@ -469,6 +524,9 @@ function readMessagesChatWebsocket(data) {
     }
 }
 
+/**
+ * Helper functions to process url
+ */
 function extractDomainFromUrl(url) {
     try {
         var urlObj = new URL(url);
@@ -494,4 +552,71 @@ function updateCurrDomain(url) {
     });
 }
 
-// TODO: set everything to false when disconnect?
+/**
+ * Helper functions to update badge text depending on
+ * notification count and unread conversation count
+ */
+function updateNotificationCnt(cnt) {
+    if (cnt !== null && cnt !== undefined) {
+        notificationCnt = cnt;
+    }
+}
+function updateUnreadConversationCnt(cnt) {
+    if (cnt !== null && cnt !== undefined) {
+        unreadConversationCnt = cnt;
+    }
+}
+
+function getFriendRequests() {
+    if (jwt !== undefined && jwt !== null) {
+        var url = 'https://bmf1kkygkl.execute-api.us-west-2.amazonaws.com/prod/friendship/requests';
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + jwt);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                var resp = JSON.parse(xhr.responseText);
+                updateNotificationCnt(resp.length);
+                updateBadgeText();
+            }
+        }
+        xhr.send();
+    }
+}
+
+function getUnreadMessages() {
+    if (jwt !== undefined && jwt !== null) {
+        var url = 'https://y9e1f4zaea.execute-api.us-west-2.amazonaws.com/prod/conversations?isRead=false';
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader('Authorization', jwt);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                var resp = JSON.parse(xhr.responseText);
+                updateUnreadConversationCnt(resp.length);
+                updateBadgeText();
+            }
+        }
+        xhr.send();
+    }
+}
+
+function updateBadgeText() {
+    // update only if there is any notification or unreadConversationCnt 
+    var badgeTextNumber = 0;
+    if (notificationCnt !== null && notificationCnt !== undefined) {
+        badgeTextNumber += notificationCnt;
+    }
+    if (unreadConversationCnt !== null && unreadConversationCnt !== undefined) {
+        badgeTextNumber += unreadConversationCnt;
+    }
+    if (badgeTextNumber === 0) {
+        chrome.browserAction.setBadgeText({
+            text: ''
+        });
+    } else {
+        chrome.browserAction.setBadgeText({
+            text: badgeTextNumber.toString()
+        });
+    }
+}

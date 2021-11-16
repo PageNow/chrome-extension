@@ -63,7 +63,7 @@
     flex-direction: row;
     justify-content: center;
     align-content: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .shareToggleButtonDiv {
@@ -72,6 +72,11 @@
 
 .shareToggleButtonSpan {
     font-size: 14px;
+}
+
+.onlineFriendsCnt {
+    font-size: 14px;
+    margin: -10px 0 15px 0;
 }
 
 .chatboxToggleDiv {
@@ -89,19 +94,21 @@
     display: flex;
     flex-direction: row;
     align-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .chatIconToggleSpan {
     font-size: 14px;
 }
 
-.chatboxToggleButtonDiv {
-    margin-right: 10px;
+.chatIconPositionSpan {
+    font-size: 12px;
+    margin-top: auto;
+    margin-left: 5px;
 }
 
-.warning-div {
-    margin-top: 10px;
+.chatboxToggleButtonDiv {
+    margin-right: 10px;
 }
 
 .spinnerDiv {

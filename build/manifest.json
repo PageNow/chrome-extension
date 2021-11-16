@@ -1,7 +1,7 @@
 {
     "name": "PageNow",
-    "version": "0.1",
-    "description": "A Chrome extension to share online activities with friends and engage in conversations",
+    "version": "0.3",
+    "description": "Share what you are reading in real-time with your friends and start contextual conversations.",
     "manifest_version": 2,
     "browser_action": {
         "default_popup": "popup.html"
@@ -14,19 +14,18 @@
     "permissions": [
         "storage",
         "tabs",
-        "activeTab",
         "alarms"
     ],
     "content_scripts": [
         {
-            "matches": ["<all_urls>"],
+            "matches": ["http://*/*", "https://*/*"],
             "js": ["./content_static/static/js/main.js", "/content_static/static/js/1.chunk.js"],
             "css": ["./content_static/static/css/main.css"],
             "match_about_blank": true
         }
     ],
     "externally_connectable": {
-        "matches": ["https://dev.d187lz05ifnwoz.amplifyapp.com/*"]
+        "matches": ["https://prod.d187lz05ifnwoz.amplifyapp.com/*"]
     },
     "icons": {
         "16": "PageNow_icon_16.png",

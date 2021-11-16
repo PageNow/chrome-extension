@@ -20,7 +20,7 @@ function ChatIcon () {
             const showChatIconKey = 'showChatIcon';
             chrome.storage.local.get([showChatIconKey], item => {
                 if (item.showChatIcon === undefined || item.showChatIcon === null) {
-                    setShowChatIcon(false);
+                    setShowChatIcon(true);
                 } else {
                     setShowChatIcon(item.showChatIcon);
                 }
