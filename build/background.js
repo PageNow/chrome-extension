@@ -41,8 +41,8 @@ chrome.alarms.create(CHAT_HEARTBEAT, {
 // Poll notifications and unread messages every 3 minutes
 // to set extension badge text
 chrome.alarms.create(NOTIFICATION_POLL, {
-    delayInMinutes: 3,
-    periodInMinutes: 3
+    delayInMinutes: 2,
+    periodInMinutes: 2
 });
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
@@ -276,7 +276,9 @@ chrome.runtime.onMessage.addListener(
                     if (tabs.length === 1) {
                         chrome.tabs.sendMessage(tabs[0].id, { type: 'auth-null' });
                     }        
-                }); 
+                });
+                notificationCnt = 0;
+                unreadConversationCnt = 0;
                 break;
             case 'curr-domain':
                 sendResponse({ code: 'success', data: { currDomain: currDomain, currUrl: currUrl } });
@@ -614,9 +616,15 @@ function updateBadgeText() {
         chrome.browserAction.setBadgeText({
             text: ''
         });
+        chrome.storage.local.set({
+            notificationCnt: 0
+        });
     } else {
         chrome.browserAction.setBadgeText({
             text: badgeTextNumber.toString()
+        });
+        chrome.storage.local.set({
+            notificationCnt: badgeTextNumber
         });
     }
 }

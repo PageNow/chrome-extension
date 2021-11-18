@@ -7,6 +7,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import styles from './Home.module.css';
 import buttonStyles from './ToggleButton.module.css';
 import { USER_API_URL, PRESENCE_API_URL } from '../../shared/config';
+import { SHARING_WARNING_MAP } from '../../shared/constants';
 
 class Home extends React.Component {
     state = {
@@ -17,7 +18,7 @@ class Home extends React.Component {
         checked: false,
         showChatIcon: null,
         chatboxOpen: false,
-        onlineFriendCnt: null
+        onlineFriendCnt: null,
     }
 
     componentDidMount() {
@@ -108,11 +109,15 @@ class Home extends React.Component {
                 chrome.tabs.sendMessage(this.props.tabId, {
                     type: 'auth-null'
                 });
-                chrome.storage.local.remove(['google-auth-session', 'auth-jwt', 'showChatIcon']);
+                chrome.storage.local.remove(['google-auth-session', 'auth-jwt']);
                 // Remove all chatbox open status
                 chrome.storage.local.get(null, items => {
                     const chatboxKeys = Object.keys(items).filter(k => k.startsWith('windowChatboxOpen_'));
                     chrome.storage.local.remove(chatboxKeys);
+                });
+                // Set showChatIcon to false instead of removing the key
+                chrome.storage.local.set({
+                    showChatIcon: false
                 });
             })
             .catch(err => {
@@ -176,6 +181,7 @@ class Home extends React.Component {
                 chrome.storage.local.set(updatedItem);
             } else {
                 updatedItem[windowChatboxOpenKey] = true;
+                updatedItem['showChatIcon'] = true;
                 chrome.storage.local.set(updatedItem);
             }
         });
@@ -201,14 +207,21 @@ class Home extends React.Component {
     }
 
     render() {
-        let currDomainDiv, shareToggleButtonSpan, shareToggleButtonDiv, spinnerDiv;
+        let currDomainDiv, shareToggleButtonSpan, shareToggleButtonDiv, chatIconToggleDiv, spinnerDiv;
         let isSharing, sharingDot, hidingDot; // display whether the domain is shared or not
-        let onlineFriendCntDiv;
+        let onlineFriendCntDiv, warningSpan;
         spinnerDiv = (
             <div className={styles.spinnerDiv}>
                 <Spinner className={styles.spinner} animation="grow" variant="primary" size="sm" />
             </div>
         );
+        if (SHARING_WARNING_MAP.hasOwnProperty(this.state.currDomain)) {
+            warningSpan = (
+                <span className={styles.warningSpan}>
+                    { SHARING_WARNING_MAP[this.state.currDomain] }
+                </span>
+            );
+        }
         if (this.state.userInfo) {
             sharingDot = <span className={styles.dot + ' ' + styles.sharingDot}></span>;
             hidingDot = <span className={styles.dot + ' ' + styles.hidingDot}></span>;
@@ -240,7 +253,6 @@ class Home extends React.Component {
                             Start sharing activity on domain
                         </span>
                     );
-                    
                 }
             } else {
                 if (this.state.userInfo.domain_deny_array.includes(this.state.currDomain)) {
@@ -287,9 +299,27 @@ class Home extends React.Component {
         if (this.state.showChatIcon) {
             chatIconPositionSpan = (
                 <span className={styles.chatIconPositionSpan}>
-                    (Bottom Left)
+                    (Bottom Right)
                 </span>
             );
+        }
+
+        if (!this.props.chatboxToggledOn) {
+            chatIconToggleDiv = (
+                <div className={styles.chatIconToggleDiv}>
+                    <div className={styles.chatboxToggleButtonDiv}>
+                        <label className={buttonStyles.switch}>
+                            <input className={`${buttonStyles.toggleInput} ${this.state.showChatIcon ? buttonStyles.toggleInputSharing : buttonStyles.toggleInputClosed}`}
+                                type="checkbox" onClick={this.toggleShowChatIcon} checked={this.state.showChatIcon} />
+                            <span className={`${buttonStyles.slider} ${buttonStyles.round} ${this.state.showChatIcon ? buttonStyles.sliderOpen : buttonStyles.sliderHiding}`}></span>
+                        </label>
+                    </div>
+                    <span className={styles.chatIconToggleSpan}>
+                        { this.state.showChatIcon ? "Hide Chat Icon" : "Show Chat Icon" }
+                    </span>
+                    { chatIconPositionSpan }
+                </div>
+            )
         }
 
         // display the number of online friends only if any
@@ -318,6 +348,7 @@ class Home extends React.Component {
                     { shareToggleButtonDiv }
                     { shareToggleButtonSpan }
                 </div>
+                { warningSpan }
 
                 <div class={styles.chatboxToggleDiv}>
                     <div className={styles.chatboxToggleButtonDiv}>
@@ -332,22 +363,10 @@ class Home extends React.Component {
                     </span>
                 </div>
 
-                <div className={styles.chatIconToggleDiv}>
-                    <div className={styles.chatboxToggleButtonDiv}>
-                        <label className={buttonStyles.switch}>
-                            <input className={`${buttonStyles.toggleInput} ${this.state.showChatIcon ? buttonStyles.toggleInputSharing : buttonStyles.toggleInputClosed}`}
-                                type="checkbox" onClick={this.toggleShowChatIcon} checked={this.state.showChatIcon} />
-                            <span className={`${buttonStyles.slider} ${buttonStyles.round} ${this.state.showChatIcon ? buttonStyles.sliderOpen : buttonStyles.sliderHiding}`}></span>
-                        </label>
-                    </div>
-                    <span className={styles.chatIconToggleSpan}>
-                        { this.state.showChatIcon ? "Hide Chat Icon" : "Show Chat Icon" }
-                    </span>
-                    { chatIconPositionSpan }
-                </div>
+                { chatIconToggleDiv }
 
                 <div>
-                    * Please <strong>refresh the page</strong> if there is something wrong with the chatbox.
+                    * Please <strong>refresh the page</strong> if something is wrong.
                 </div>
             </div>
         );

@@ -4,12 +4,14 @@ import Draggable from 'react-Draggable';
 
 import './ChatIcon.css';
 import iconImg from '../../assets/PageNowIcon.png';
+import iconImgNotification from '../../assets/PageNowIcon_notification.png';
 
 let isDragging = false;
 
 function ChatIcon () {
     const [ windowId, setWindowId ] = useState(-1);
     const [ showChatIcon, setShowChatIcon ] = useState(true);
+    const [ notificationCnt, setNotificationCnt ] = useState(0);
 
     useEffect(() => {
         if (windowId === -1) {
@@ -19,16 +21,22 @@ function ChatIcon () {
         } else {
             const showChatIconKey = 'showChatIcon';
             chrome.storage.local.get([showChatIconKey], item => {
-                if (item.showChatIcon === undefined || item.showChatIcon === null) {
-                    setShowChatIcon(true);
-                } else {
-                    setShowChatIcon(item.showChatIcon);
-                }
+                // show chat icon by default when there is no value for 'showChatIcon' key in chrome storage
+                setShowChatIcon(item.showChatIcon);
             });
 
+            const notificationCntKey = 'notificationCnt';
+            chrome.storage.local.get([notificationCntKey], item => {
+                setNotificationCnt(item[notificationCntKey]);
+            });
+
+            
             chrome.storage.onChanged.addListener((changes, namespace) => {
-                if (Object.keys(changes).includes(showChatIconKey)) {
-                    setShowChatIcon(changes.showChatIcon.newValue);
+                if (changes.hasOwnProperty(showChatIconKey)) {
+                    setShowChatIcon(changes[showChatIconKey].newValue);
+                }
+                if (changes.hasOwnProperty(notificationCntKey)) {
+                    setNotificationCnt(changes[notificationCntKey].newValue);
                 }
             });
         }
@@ -62,8 +70,9 @@ function ChatIcon () {
         return (
             <Draggable onStart={handleStart} onDrag={handleDrag} onStop={handleStop}>
                 <span className="pagenow-chat-icon-span">
-                    <img alt='Chat Icon' src={iconImg} draggable="false"
-                         style={{display: 'none'}}/>
+                    <img alt='Chat Icon' draggable="false" style={{display: 'none'}}
+                         src={notificationCnt && notificationCnt > 0 ? iconImgNotification : iconImg}
+                    />
                 </span>
             </Draggable>
         );

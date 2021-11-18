@@ -63,7 +63,6 @@
     flex-direction: row;
     justify-content: center;
     align-content: center;
-    margin-bottom: 20px;
 }
 
 .shareToggleButtonDiv {
@@ -83,6 +82,7 @@
     display: flex;
     flex-direction: row;
     align-content: center;
+    margin-top: 20px;
     margin-bottom: 10px;
 }
 
@@ -114,4 +114,8 @@
 .spinnerDiv {
     text-align: center;
     height: 16px;
+}
+
+.warningSpan {
+    color: #DC143C;
 }
