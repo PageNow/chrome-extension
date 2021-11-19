@@ -94,7 +94,7 @@
     display: flex;
     flex-direction: row;
     align-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .chatIconToggleSpan {
@@ -118,4 +118,25 @@
 
 .warningSpan {
     color: #DC143C;
+}
+
+.refreshDiv {
+    margin-bottom: 15px;
+}
+
+.inviteHeader {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.emailSentSuccessDiv {
+    color: #0074D9;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.emailSentFailureDiv {
+    color: #DC143C;
+    font-size: 13px;
+    margin-top: 3px;
 }

@@ -3,10 +3,13 @@ import React from 'react';
 import { Auth } from '@aws-amplify/auth';
 import axios from 'axios';
 import Spinner from 'react-bootstrap/Spinner';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Button from 'react-bootstrap/Button';
+import FormControl from 'react-bootstrap/FormControl';
 
 import styles from './Home.module.css';
 import buttonStyles from './ToggleButton.module.css';
-import { USER_API_URL, PRESENCE_API_URL } from '../../shared/config';
+import { USER_API_URL, PRESENCE_API_URL, EMAIL_API_URL } from '../../shared/config';
 import { SHARING_WARNING_MAP } from '../../shared/constants';
 
 class Home extends React.Component {
@@ -19,6 +22,9 @@ class Home extends React.Component {
         showChatIcon: null,
         chatboxOpen: false,
         onlineFriendCnt: null,
+        recipientEmail: '',
+        emailSentMsg: '',
+        emailSentSuccess: false
     }
 
     componentDidMount() {
@@ -199,11 +205,44 @@ class Home extends React.Component {
                 });
             })
             .then(res => {
-                console.log(res.data);
                 this.setState({
                     onlineFriendCnt: res.data.presenceArr.filter(x => x.page !== null).length
                 });
+            });
+    }
+
+    handleRecipientEmailChange = (event) => {
+        this.setState({
+            recipientEmail: event.target.value
+        });
+    }
+
+    sendInviteEmail = () => {
+        Auth.currentSession()
+            .then(session => {
+                const body = {
+                    senderFirstName: this.state.userInfo.first_name,
+                    senderLastName: this.state.userInfo.last_name,
+                    recipientEmail: this.state.recipientEmail
+                };
+                const options = {
+                    headers: { Authorization: session.getIdToken().getJwtToken() }
+                };
+                return axios.post(`${EMAIL_API_URL}/email`, body, options);
             })
+            .then(res => {
+                this.setState({
+                    recipientEmail: '',
+                    emailSentMsg: 'Invitation is sent!',
+                    emailSentSuccess: true
+                });
+            })
+            .catch(err => {
+                this.setState({
+                    emailSentMsg: 'Sorry, something went wrong...',
+                    emailSentSuccess: false
+                });
+            });
     }
 
     render() {
@@ -365,8 +404,24 @@ class Home extends React.Component {
 
                 { chatIconToggleDiv }
 
-                <div>
-                    * Please <strong>refresh the page</strong> if something is wrong.
+                <div className={styles.refreshDiv}>
+                    * <strong>Refresh the page</strong> if the client is missing or something is wrong.
+                </div>
+
+                <div className={styles.inviteHeader}>
+                    <strong>Invite friends</strong> to enjoy PageNow more!
+                </div>
+                <InputGroup size="sm">
+                    <FormControl size="sm" placeholder="Enter your friend's email" 
+                        value={this.state.recipientEmail}
+                        onChange={this.handleRecipientEmailChange}    
+                    />
+                    <Button variant="outline-secondary" onClick={this.sendInviteEmail}>
+                        Invite
+                    </Button>
+                </InputGroup>
+                <div className={this.state.emailSentSuccess ? styles.emailSentSuccessDiv : styles.emailSentFailureDiv}>
+                    { this.state.emailSentMsg }
                 </div>
             </div>
         );

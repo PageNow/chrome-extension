@@ -1,6 +1,6 @@
 {
     "name": "PageNow",
-    "version": "0.4",
+    "version": "0.5",
     "description": "Share what you are reading in real-time with your friends and start contextual conversations.",
     "manifest_version": 2,
     "browser_action": {

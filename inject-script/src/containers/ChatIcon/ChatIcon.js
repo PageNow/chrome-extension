@@ -3,8 +3,17 @@ import React, { useEffect, useState } from 'react';
 import Draggable from 'react-Draggable';
 
 import './ChatIcon.css';
-import iconImg from '../../assets/PageNowIcon.png';
-import iconImgNotification from '../../assets/PageNowIcon_notification.png';
+import iconImg_0 from '../../assets/PageNowIcon.png';
+import iconImg_1 from '../../assets/PageNowIcon_1.png';
+import iconImg_2 from '../../assets/PageNowIcon_2.png';
+import iconImg_3 from '../../assets/PageNowIcon_3.png';
+import iconImg_4 from '../../assets/PageNowIcon_4.png';
+import iconImg_5 from '../../assets/PageNowIcon_5.png';
+import iconImg_6 from '../../assets/PageNowIcon_6.png';
+import iconImg_7 from '../../assets/PageNowIcon_7.png';
+import iconImg_8 from '../../assets/PageNowIcon_8.png';
+import iconImg_9 from '../../assets/PageNowIcon_9.png';
+import iconImg_9plus from '../../assets/PageNowIcon_9+.png';
 
 let isDragging = false;
 
@@ -66,12 +75,39 @@ function ChatIcon () {
         });
     }
 
+    let iconImg;
+    if (notificationCnt === 0) {
+        iconImg = iconImg_0;
+    } else if (notificationCnt === 1) {
+        iconImg = iconImg_1;
+    } else if (notificationCnt === 2) {
+        iconImg = iconImg_2;
+    } else if (notificationCnt === 3) {
+        iconImg = iconImg_3;
+    } else if (notificationCnt === 4) {
+        iconImg = iconImg_4;
+    } else if (notificationCnt === 5) {
+        iconImg = iconImg_5;
+    } else if (notificationCnt === 6) {
+        iconImg = iconImg_6;
+    } else if (notificationCnt === 7) {
+        iconImg = iconImg_7;
+    } else if (notificationCnt === 8) {
+        iconImg = iconImg_8;
+    } else if (notificationCnt === 9) {
+        iconImg = iconImg_9;
+    } else if (notificationCnt > 9) {
+        iconImg = iconImg_9plus;
+    } else {
+        iconImg = iconImg_0;
+    }
+
     if (showChatIcon) {
         return (
             <Draggable onStart={handleStart} onDrag={handleDrag} onStop={handleStop}>
                 <span className="pagenow-chat-icon-span">
                     <img alt='Chat Icon' draggable="false" style={{display: 'none'}}
-                         src={notificationCnt && notificationCnt > 0 ? iconImgNotification : iconImg}
+                         src={iconImg}
                     />
                 </span>
             </Draggable>
