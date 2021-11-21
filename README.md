@@ -1,5 +1,9 @@
 # PageNow chrome extension
 
+Link to Chrome Web Store: https://chrome.google.com/webstore/detail/pagenow/lplobiaakhgkjcldopgkbcibeilddbmc
+
+This repository holds code for the Chrome extension. Chrome extension is composed of two components: popup and content script. Popup is the screen that pops up when you click the extension icon. Content script is the iframe injection to every website. [chat-client](https://github.com/PageNow/chat-client) is injected to the iframe.
+
 ## Overview
 
 Using javascript injection, we create iframe that hosts chatbox.
