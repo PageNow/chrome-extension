@@ -248,7 +248,7 @@ class Home extends React.Component {
     render() {
         let currDomainDiv, shareToggleButtonSpan, shareToggleButtonDiv, chatIconToggleDiv, spinnerDiv;
         let isSharing, sharingDot, hidingDot; // display whether the domain is shared or not
-        let onlineFriendCntDiv, warningSpan;
+        let onlineFriendCntDiv, warningSpan, refreshDiv;
         spinnerDiv = (
             <div className={styles.spinnerDiv}>
                 <Spinner className={styles.spinner} animation="grow" variant="primary" size="sm" />
@@ -276,7 +276,7 @@ class Home extends React.Component {
                     );
                     shareToggleButtonSpan = (
                         <span className={styles.shareToggleButtonSpan}>
-                            Stop sharing activity on domain
+                            { chrome.i18n.getMessage("toggleStopSharing") }
                         </span>
                     );
                 } else {
@@ -289,7 +289,7 @@ class Home extends React.Component {
                     );
                     shareToggleButtonSpan = (
                         <span className={styles.shareToggleButtonSpan}>
-                            Start sharing activity on domain
+                            { chrome.i18n.getMessage("toggleStartSharing") }
                         </span>
                     );
                 }
@@ -304,7 +304,7 @@ class Home extends React.Component {
                     );
                     shareToggleButtonSpan = (
                         <span className={styles.shareToggleButtonSpan}>
-                            Start sharing activity on domain
+                            { chrome.i18n.getMessage("toggleStartSharing") }
                         </span>
                     );
                 } else {
@@ -317,7 +317,7 @@ class Home extends React.Component {
                     );
                     shareToggleButtonSpan = (
                         <span className={styles.shareToggleButtonSpan}>
-                            Stop sharing activity on domain
+                            { chrome.i18n.getMessage("toggleStopSharing") }
                         </span>
                     );
                 }
@@ -338,7 +338,7 @@ class Home extends React.Component {
         if (this.state.showChatIcon) {
             chatIconPositionSpan = (
                 <span className={styles.chatIconPositionSpan}>
-                    (Bottom Right)
+                    ({ chrome.i18n.getMessage("chatIconLocation") })
                 </span>
             );
         }
@@ -354,7 +354,7 @@ class Home extends React.Component {
                         </label>
                     </div>
                     <span className={styles.chatIconToggleSpan}>
-                        { this.state.showChatIcon ? "Hide Chat Icon" : "Show Chat Icon" }
+                        { this.state.showChatIcon ? chrome.i18n.getMessage("toggleChatIconOff") : chrome.i18n.getMessage("toggleChatIconOn") }
                     </span>
                     { chatIconPositionSpan }
                 </div>
@@ -365,7 +365,7 @@ class Home extends React.Component {
         if (this.state.onlineFriendCnt !== null && this.state.onlineFriendCnt > 0) {
             onlineFriendCntDiv = (
                 <div className={styles.onlineFriendsCnt}>
-                    <i>Number of friends online: <strong>{ this.state.onlineFriendCnt }</strong></i>
+                    <i>{chrome.i18n.getMessage("onlineFriendsCount")}: <strong>{ this.state.onlineFriendCnt }</strong></i>
                 </div>
             )
         }
@@ -377,7 +377,7 @@ class Home extends React.Component {
                         {this.props.email}
                     </span>
                     <span className={styles.signOutSpan} onClick={this.handleSignOut}>
-                        Sign Out
+                        { chrome.i18n.getMessage("signOut") }
                     </span>
                 </div>
                 { spinnerDiv }
@@ -398,26 +398,26 @@ class Home extends React.Component {
                         </label>
                     </div>
                     <span className={styles.chatboxToggleSpan}>
-                        { this.props.chatboxToggledOn ? "Close Chatbox" : "Open Chatbox" }
+                        { this.props.chatboxToggledOn ? chrome.i18n.getMessage("toggleChatboxOff") : chrome.i18n.getMessage("toggleChatboxOn") }
                     </span>
                 </div>
 
                 { chatIconToggleDiv }
 
                 <div className={styles.refreshDiv}>
-                    * <strong>Refresh the page</strong> if the client is missing or something is wrong.
+                    * { chrome.i18n.getMessage("refreshMessage") }
                 </div>
 
                 <div className={styles.inviteHeader}>
-                    <strong>Invite friends</strong> to enjoy PageNow more!
+                    { chrome.i18n.getMessage("invitationHeader") }
                 </div>
                 <InputGroup size="sm">
-                    <FormControl size="sm" placeholder="Enter your friend's email" 
+                    <FormControl size="sm" placeholder={ chrome.i18n.getMessage("inviteInputPlaceholder") }
                         value={this.state.recipientEmail}
                         onChange={this.handleRecipientEmailChange}    
                     />
                     <Button variant="outline-secondary" onClick={this.sendInviteEmail}>
-                        Invite
+                        { chrome.i18n.getMessage("inviteButtonContent") }
                     </Button>
                 </InputGroup>
                 <div className={this.state.emailSentSuccess ? styles.emailSentSuccessDiv : styles.emailSentFailureDiv}>

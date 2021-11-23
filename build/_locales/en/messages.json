@@ -1,0 +1,74 @@
+{
+    "onlineFriendsCount": {
+        "message": "Number of friends online",
+        "description": "Number of friends online"
+    },
+    "signOut": {
+        "message": "Sign Out",
+        "description": "Sign Out"
+    },
+    "toggleStartSharing": {
+        "message": "Start sharing activity on domain",
+        "description": "Toggle button for start sharing activity"
+    },
+    "toggleStopSharing": {
+        "message": "Stop sharing activity on domain",
+        "description": "Toggle button for stop sharing activity"
+    },
+    "toggleChatboxOn": {
+        "message": "Open Chatbox",
+        "description": "Toggle button for opening chatbox"
+    },
+    "toggleChatboxOff": {
+        "message": "Close Chatbox",
+        "description": "Toggle button for closing chatbox"
+    },
+    "toggleChatIconOn": {
+        "message": "Show Chat Icon",
+        "description": "Toggle button for showing chat icon"
+    },
+    "toggleChatIconOff": {
+        "message": "Hide Chat Icon",
+        "description": "Toggle button for hiding chat icon"
+    },
+    "chatIconLocation": {
+        "message": "Bottom Right",
+        "description": "Location of chat icon on chrome window"
+    },
+    "refreshMessage": {
+        "message": "Refresh the page if the client is missing or something is wrong.",
+        "description": "Refresh upon error message"
+    },
+    "invitationHeader": {
+        "message": "Invite friends to enjoy PageNow more!",
+        "description": "Invitation header message"
+    },
+    "inviteButtonContent": {
+        "message": "Invite",
+        "description": "Content inside the invite button"
+    },
+    "inviteInputPlaceholder": {
+        "message": "Enter your friend's email",
+        "description": "Invitation email input placeholder"
+    },
+    "googleWarningMessage": {
+        "message": "Allowing google.com may result in sharing personal activities (e.g. Gmail, Calendar)",
+        "description": "Google domain sharing warning message"
+    },
+    "messengerWarningMessage": {
+        "message": "Allowing messenger.com may result in sharing personal activities",
+        "description": "Messenger domain sharing warning message"
+    },
+    "notionWarningMessage": {
+        "message": "Allowing notion.so may result in sharing personal activities",
+        "description": "Notion domain sharing warning message"
+    },
+    "facebookWarningMessage": {
+        "message": "Allowing facebook.com may result in sharing personal activities",
+        "description": "Facebook domain sharing warning message"
+    },
+    "instagramWarningMessage": {
+        "message": "Allowing instagram.com may result in sharing personal activities",
+        "description": "Instagram domain sharing warning message"
+    }
+}
