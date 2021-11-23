@@ -248,7 +248,7 @@ class Home extends React.Component {
     render() {
         let currDomainDiv, shareToggleButtonSpan, shareToggleButtonDiv, chatIconToggleDiv, spinnerDiv;
         let isSharing, sharingDot, hidingDot; // display whether the domain is shared or not
-        let onlineFriendCntDiv, warningSpan, refreshDiv;
+        let onlineFriendCntDiv, warningSpan;
         spinnerDiv = (
             <div className={styles.spinnerDiv}>
                 <Spinner className={styles.spinner} animation="grow" variant="primary" size="sm" />
