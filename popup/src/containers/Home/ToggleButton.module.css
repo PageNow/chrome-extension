@@ -42,7 +42,7 @@
 }
   
 .sliderHiding:before {
-    right: 4px;
+    left: 4px;
 }
 
 .sliderSharing {
@@ -50,7 +50,7 @@
 }
 
 .sliderSharing:before {
-    left: 4px;
+    right: 4px;
 }
   
 .toggleInputHiding:checked + .sliderHiding {
@@ -97,7 +97,7 @@
 }
 
 .sliderOpen:before {
-    left: 4px;
+    right: 4px;
 }
 
 .toggleInputClosed:checked + .sliderHiding {
