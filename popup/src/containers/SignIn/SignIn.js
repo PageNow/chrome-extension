@@ -89,17 +89,17 @@ class SignIn extends React.Component {
                     <img className={authStyles.authHeaderImg} src={PageNowLogo} alt="PageNow Logo"/>
                 </div>
 
-                <div className={styles.emailLabelDiv}>Email</div>
+                <div className={styles.emailLabelDiv}>{ chrome.i18n.getMessage("email") }</div>
                 <Form.Control size="sm" type="email"
-                    placeholder="Enter email"
+                    placeholder={ chrome.i18n.getMessage("emailInputPlaceholder") }
                     value={this.state.emailInput}
                     onChange={this.handleEmailInputChange}
                     onBlur={this.validateEmailInput}
                 />
 
-                <div className={styles.passwordLabelDiv}>Password</div>
+                <div className={styles.passwordLabelDiv}>{ chrome.i18n.getMessage("password") }</div>
                 <Form.Control size="sm" type="password"
-                    placeholder="Enter password"
+                    placeholder={ chrome.i18n.getMessage("passwordInputPlaceholder") }
                     value={this.state.passwordInput}
                     onChange={this.handlePasswordInputChange}
                 />
@@ -114,7 +114,7 @@ class SignIn extends React.Component {
                 <div className={styles.forgotPasswordDiv}>
                     <span className={styles.forgotPasswordSpan}
                         onClick={() => {this.props.authModeHandler('forgot-password')}}>
-                        Forgot password?
+                        { chrome.i18n.getMessage("forgotPassword") }
                     </span>
                 </div>
 
@@ -122,24 +122,24 @@ class SignIn extends React.Component {
                     disabled={this.state.warning ||
                         !this.state.emailInputTouched || !this.state.passwordInputTouched}
                     block={true} onClick={this.handleEmailSignIn}>
-                    <strong>Sign In</strong>
+                    <strong>{ chrome.i18n.getMessage("signIn") }</strong>
                 </Button>
                 
                 <div className={styles.signUpDiv}>
-                    Need an account?
+                    { chrome.i18n.getMessage("needAccountQuestion") }
                     <span className={styles.signUpSpan}
                         onClick={() => {this.props.authModeHandler('sign-up')}}>
-                        <strong>Sign up</strong>
+                        <strong>{ chrome.i18n.getMessage("signUp") }</strong>
                     </span>
                 </div>
 
-                <span className={authStyles.orSpan}>Or</span>
+                <span className={authStyles.orSpan}>{ chrome.i18n.getMessage("or") }</span>
 
                 <div className={authStyles.googleBtn} onClick={this.props.googleSignInHandler}>
                     <div className={authStyles.googleIconWrapper}>
                         <img class={authStyles.googleIcon} src={GoogleLogo} alt="google-logo"/>
                     </div>
-                    <p className={authStyles.btnText}><b>Continue with google</b></p>
+                    <p className={authStyles.btnText}><b>{ chrome.i18n.getMessage("continueWithGoogle") }</b></p>
                 </div>
                 <AuthFooter />
             </div>

@@ -1,3 +1,4 @@
+/*global chrome*/
 import React from 'react';
 
 import styles from './TabWarning.module.css';
@@ -11,7 +12,7 @@ class TabWarning extends React.Component {
                     <img className={styles.headerImg} src={PageNowLogo} alt="PageNow Logo"/>
                 </div>
                 <div className={styles.warningDiv}>
-                    Please Switch to a Different Tab to Sign In!
+                    { chrome.i18n.getMessage("switchTabWarningMessage") }
                 </div>
             </div>
         )

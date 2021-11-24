@@ -1,3 +1,4 @@
+/*global chrome*/
 import React from 'react';
 import { Auth } from '@aws-amplify/auth';
 import Form from 'react-bootstrap/Form';
@@ -31,7 +32,8 @@ class ResetPassword extends React.Component {
     handlePasswordConfirmInputChange = (event) => {
         this.setState({
             passwordConfirmInput: event.target.value,
-            warning: this.state.newPasswordInput !== event.target.value ? 'The passwords do not match.' : ''
+            warning: this.state.newPasswordInput !== event.target.value ?
+                chrome.i18n.getMessage("passwordMismatchError") : ''
         })
     }
 
@@ -60,32 +62,32 @@ class ResetPassword extends React.Component {
             <div className={styles.resetPasswordDiv}>
                 <div className={authStyles.backDiv}>
                     <span className={authStyles.backSpan} onClick={this.handleClickBack}>
-                        &lt; Back
+                        &lt; { chrome.i18n.getMessage("back") }
                     </span>
                 </div>
                 <div className={authStyles.authTextHeaderDiv}>
-                    <strong>Reset password</strong>
+                    <strong>{ chrome.i18n.getMessage("resetPassword") }</strong>
                 </div>
 
                 <div className={styles.codeDiv}>
-                    <div className={styles.codeLabelDiv}>Verification Code</div>
+                    <div className={styles.codeLabelDiv}>{ chrome.i18n.getMessage("verificationCode") }</div>
                     <Form.Control size="sm" type="text"
-                        placeholder="Enter code"
+                        placeholder={ chrome.i18n.getMessage("verificationCodeInputPlaceholder") }
                         value={this.state.codeInput}
                         onChange={this.handleCodeInputChange}
                     />
                 </div>
 
-                <div className={styles.newPasswordLabelDiv}>New Password</div>
+                <div className={styles.newPasswordLabelDiv}>{ chrome.i18n.getMessage("newPassword") }</div>
                 <Form.Control size="sm" type="password"
-                    placeholder="Enter new password"
+                    placeholder={ chrome.i18n.getMessage("newPasswordInputPlaceholder") }
                     value={this.state.newPasswordInput}
                     onChange={this.handleNewPasswordInputChange}
                 />
 
-                <div className={styles.newPasswordLabelDiv}>Confirm Password</div>
+                <div className={styles.newPasswordLabelDiv}>{ chrome.i18n.getMessage("confirmPassword") }</div>
                 <Form.Control size="sm" type="password"
-                    placeholder="Confirm password"
+                    placeholder={ chrome.i18n.getMessage("confirmPasswordInputPlaceholder") }
                     value={this.state.passwordConfirmInput}
                     onChange={this.handlePasswordConfirmInputChange}
                 />
@@ -99,7 +101,7 @@ class ResetPassword extends React.Component {
                 <Button className={styles.resetPasswordButton}
                     disabled={this.state.warning}
                     variant='dark' size='sm' block={true} onClick={this.handleResetPassword}>
-                    <strong>Reset Password</strong>
+                    <strong>{ chrome.i18n.getMessage("resetPassword") }</strong>
                 </Button>
 
                 <AuthFooter />

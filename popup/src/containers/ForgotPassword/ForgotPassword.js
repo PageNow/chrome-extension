@@ -1,3 +1,4 @@
+/*global chrome*/
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -57,22 +58,22 @@ class ForgotPassword extends React.Component {
             <div className={styles.forgotPasswordDiv}>
                 <div className={authStyles.backDiv}>
                     <span className={authStyles.backSpan} onClick={this.handleClickBack}>
-                        &lt; Back
+                        &lt; { chrome.i18n.getMessage("back") }
                     </span>
                 </div>
                 <div className={authStyles.authTextHeaderDiv}>
-                    <strong>Forgot Password</strong>
+                    <strong>{ chrome.i18n.getMessage("forgotPasswordHeader") }</strong>
                 </div>
 
                 <div className={styles.forgotPasswordSubheaderDiv}>
-                    Enter your email and we will send you a verification code.
+                    { chrome.i18n.getMessage("forgotPasswordInstruction") }
                 </div>
 
                 <div>
-                    <div className={styles.emailLabelDiv}>Email</div>
+                    <div className={styles.emailLabelDiv}>{ chrome.i18n.getMessage("email") }</div>
                     <Form.Control size="sm" type="email"
                         className={styles.emailForm}
-                        placeholder="Enter email"
+                        placeholder={ chrome.i18n.getMessage("emailInputPlaceholder") }
                         value={this.props.forgotPasswordEmail}
                         onChange={this.handleEmailInputChange}
                     />
@@ -89,7 +90,7 @@ class ForgotPassword extends React.Component {
                     disabled={(this.state.error !== null && this.state.error !== '') ||
                               this.props.forgotPasswordEmail === ''}
                 >
-                    <strong>Send Verification Code</strong>
+                    <strong>{ chrome.i18n.getMessage("sendVerificationCode") }</strong>
                 </Button>
 
                 <Button className={styles.sendCodeButton} 
@@ -97,7 +98,7 @@ class ForgotPassword extends React.Component {
                     disabled={(this.state.error !== null && this.state.error !== '') ||
                               this.props.forgotPasswordEmail === ''}
                 >
-                    <strong>I have Verification Code!</strong>
+                    <strong>{ chrome.i18n.getMessage("alreadyHaveVerificationCode") }</strong>
                 </Button>
 
                 <AuthFooter />

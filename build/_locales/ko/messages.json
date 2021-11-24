@@ -1,3 +1,214 @@
 {
-    
+    "onlineFriendsCount": {
+        "message": "접속중인 친구 수",
+        "description": "현재 접속중인 친구의 숫자"
+    },
+    "signOut": {
+        "message": "로그아웃",
+        "description": "로그아웃 메시지"
+    },
+    "toggleStartSharing": {
+        "message": "현재 도메인에서의 활동을 공개하기",
+        "description": "현재 도메인에서의 활동 공개 토글 버튼 메시지"
+    },
+    "toggleStopSharing": {
+        "message": "현재 도메인에서의 활동을 숨기기",
+        "description": "현재 도메인에서의 활동 숨기는 토글 버튼 메시지"
+    },
+    "toggleChatboxOn": {
+        "message": "PageNow 열기",
+        "description": "PageNow 클라이언트 열기 버튼"
+    },
+    "toggleChatboxOff": {
+        "message": "PageNow 닫기",
+        "description": "PageNow 클라이언트 닫기 버튼"
+    },
+    "toggleChatIconOn": {
+        "message": "PageNow 아이콘 보여주기",
+        "description": "PageNow 아이콘 보여주기 버튼"
+    },
+    "toggleChatIconOff": {
+        "message": "PageNow 아이콘 숨기기",
+        "description": "PageNow 아이콘 숨기기 버튼"
+    },
+    "chatIconLocation": {
+        "message": "화면 우측 하단",
+        "description": "화면에서 PageNow 아이콘 위치"
+    },
+    "refreshMessage": {
+        "message": "문제가 발생하면 페이지를 새로고침 하세요!",
+        "description": "새로 고침 메시지"
+    },
+    "invitationHeader": {
+        "message": "친구를 초대하면 PageNow가 더 재밌습니다!",
+        "description": "친구 초대 헤더 메시지"
+    },
+    "inviteButtonContent": {
+        "message": "초대하기",
+        "description": "친구 초대 버튼"
+    },
+    "inviteInputPlaceholder": {
+        "message": "친구 이메일 입력",
+        "description": "친구 초대 입력 박스 placeholder"
+    },
+    "googleWarningMessage": {
+        "message": "google.com에서의 활동을 공유하면 Gmail, Calendar 등으로 개인 활동 정보가 노출될 수 있습니다.",
+        "description": "google.com 활동 공유 주의 메시지"
+    },
+    "messengerWarningMessage": {
+        "message": "messenger.com에서의 활동을 공유하면 개인 활동 정보가 공개될 수 있습니다.",
+        "description": "messenger.com 활동 공유 주의 메시지"
+    },
+    "notionWarningMessage": {
+        "message": "notion.so에서의 활동을 공유하면 개인 활동 정보가 공개될 수 있습니다",
+        "description": "notion.so 활동 공유 주의 메시지"
+    },
+    "facebookWarningMessage": {
+        "message": "facebook.com에서의 활동을 공유하면 개인 활동 정보가 공개될 수 있습니다.",
+        "description": "facebook.com 활동 공유 주의 메시지"
+    },
+    "instagramWarningMessage": {
+        "message": "instagram.com에서의 활동을 공유하면 개인 활동 정보가 공개될 수 있습니다.",
+        "description": "instagram.com 활동 공유 주의 메시지"
+    },
+    "switchTabWarningMessage": {
+        "message": "로그인하려면 다른 탭을 열어주세요!",
+        "description": "탭 교체 메시지"
+    },
+    "email": {
+        "message": "이메일",
+        "description": "이메일"
+    },
+    "emailInputPlaceholder": {
+        "message": "이메일을 입력하세요",
+        "description": "이메일 입력 박스 placeholder"
+    },
+    "password": {
+        "message": "비밀번호",
+        "description": "비밀번호"
+    },
+    "passwordInputPlaceholder": {
+        "message": "비밀번호를 입력하세요",
+        "description": "비밀번호 입력 박스 placeholder"
+    },
+    "newPassword": {
+        "message": "새 비밀번호",
+        "description": "새 비밀번호"
+    },
+    "newPasswordInputPlaceholder": {
+        "message": "새 비밀번호를 입력하세요",
+        "description": "새 비밀번호 입력 박스 placeholder"
+    },
+    "confirmPassword": {
+        "message": "비밀번호 확인",
+        "description": "비밀번호 확인"
+    },
+    "confirmPasswordInputPlaceholder": {
+        "message": "비밀번호를 다시 입력하세요",
+        "description": "비밀번호 확인 입력 박스 placeholder"
+    },
+    "signUp": {
+        "message": "회원가입",
+        "description": "회원가입"
+    },
+    "signIn": {
+        "message": "로그인",
+        "description": "로그인"
+    },
+    "forgotPassword": {
+        "message": "비밀번호 찾기",
+        "description": "비밀번호 찾기 메시지"
+    },
+    "needAccountQuestion": {
+        "message": "계정이 필요하신가요?",
+        "description": "가입하기 메시지"
+    },
+    "haveAccountQuestion": {
+        "message": "이미 가입을 하셨나요?",
+        "description": "가입확인 메시지"
+    },
+    "continueWithGoogle": {
+        "message": "Google 계정으로 로그인하기",
+        "description": "구글 계정 로그인 버튼"
+    },
+    "signUpAgreementBefore": {
+        "message": "회원가입 시 PageNow의 ",
+        "description": "Sign up agreement before links"
+    },
+    "signUpAgreementAfter": {
+        "message": "에 동의하게 됩니다.",
+        "description": "Sign up agreement after links"
+    },
+    "privacyPolicy": {
+        "message": "개인 정보 정책",
+        "description": "개인 정보 정책"
+    },
+    "termsOfService": {
+        "message": "서비스 약관",
+        "description": "서비스 약관"
+    },
+    "or": {
+        "message": "혹은",
+        "description": "혹은"
+    },
+    "and": {
+        "message": "및 ",
+        "description": "및"
+    },
+    "back": {
+        "message": "뒤로 가기",
+        "description": "뒤로 가기"
+    },
+    "forgotPasswordHeader": {
+        "message": "비밀번호 찾기",
+        "description": "비밀번호 찾기 페이지 제목"
+    },
+    "forgotPasswordInstruction": {
+        "message": "입력하신 이메일 주소로 인증 코드를 보내드립니다.",
+        "description": "비밀번호 찾기 방법"
+    },
+    "sendVerificationCode": {
+        "message": "인증 코드 보내기",
+        "description": "인증 코드 보내기 버튼"
+    },
+    "alreadyHaveVerificationCode": {
+        "message": "인증 코드 입력하기",
+        "description": "인증 코드 입력하기 버튼"
+    },
+    "emailValidationError": {
+        "message": "이메일 형식이 올바르지 않습니다.",
+        "description": "이메일 형식 에러 메시지"
+    },
+    "passwordMissingLowercaseError": {
+        "message": "비밀번호는 소문자를 포함해야 합니다.",
+        "description": "비밀번호 소문자 에러 메시지"
+    },
+    "passwordMissingNumberError": {
+        "message": "비밀번호는 숫자를 포함해야 합니다.",
+        "description": "비밀번호 숫자 에러 메시지"
+    },
+    "passwordMissingSpecialCharacterError": {
+        "message": "비밀번호는 특수문자를 포함해야 합니다.",
+        "description": "비밀번호 특수문자 에러 메시지"
+    },
+    "passwordLengthError": {
+        "message": "비밀번호는 최소 8자리여야 합니다.",
+        "description": "비밀번호 길이 에러 메시지"
+    },
+    "passwordMismatchError": {
+        "message": "비밀번호가 일치하지 않습니다.",
+        "description": "비밀번호 불일치 에러 메시지"
+    },
+    "resetPassword": {
+        "message": "비밀번호 재설정",
+        "description": "비밀번호 재설정 페이지 제목"
+    },
+    "verificationCode": {
+        "message": "인증 코드",
+        "description": "인증 코드"
+    },
+    "verificationCodeInputPlaceholder": {
+        "message": "인증 코드를 입력하세요",
+        "description": "인증 코드 입력 박스 placeholder"
+    }
 }

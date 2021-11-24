@@ -1,23 +1,25 @@
+/*global chrome*/
+
 /* Return null if valid and warning message if invalid */
 export const validateEmail = (inputStr) => {
     const emailValid = inputStr.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
     if (emailValid) {
         return null;
     } else {
-        return "Email has invalid format."
+        return chrome.i18n.getMessage("emailValidationError");
     }
 }
 
 /* Return null if valid and warning message if invalid */
 export const validatePassword = (inputStr) => {
     if (inputStr.toUpperCase() === inputStr) {
-        return "Password must contain lowercase characters.";
+        return chrome.i18n.getMessage("passwordMissingLowercaseError");
     } else if (!/\d/.test(inputStr)) {
-        return "Password must contain a number.";
+        return chrome.i18n.getMessage("passwordMissingNumberError");
     } else if (!/[\^$*.[\]{}()?"!@#%&/\\,><':;|_~`]/.test(inputStr)) {
-        return "Password must contain special characters.";
+        return chrome.i18n.getMessage("passwordMissingSpecialCharacterError");
     } else if (inputStr.length < 8) {
-        return "Password must be at least 8 characters.";
+        return chrome.i18n.getMessage("passwordLengthError");
     } else {
         return null;
     }

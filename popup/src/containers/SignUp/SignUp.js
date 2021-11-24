@@ -1,3 +1,4 @@
+/*global chrome*/
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -45,7 +46,7 @@ class SignUp extends React.Component {
             if (this.state.passwordConfirmInputTouched && 
                 this.state.passwordInput !== this.state.passwordConfirmInput) {
                 this.setState({
-                    warning: "The passwords do not match."
+                    warning: chrome.i18n.getMessage("passwordMismatchError")
                 });
             } else {
                 this.setState({
@@ -81,9 +82,9 @@ class SignUp extends React.Component {
                 </div>
 
                 <div className={styles.emailDiv}>
-                    <div className={styles.emailLabelDiv}>Email</div>
+                    <div className={styles.emailLabelDiv}>{ chrome.i18n.getMessage("email") }</div>
                     <Form.Control size="sm" type="email"
-                        placeholder="Enter email"
+                        placeholder={ chrome.i18n.getMessage("emailInputPlaceholder") }
                         value={this.state.emailInput}
                         onChange={this.handleEmailInputChange}
                         onBlur={this.validateEmailInput}
@@ -91,18 +92,18 @@ class SignUp extends React.Component {
                 </div>
 
                 <div className={styles.passwordDiv}>
-                    <div className={styles.passwordLabelDiv}>Password</div>
+                    <div className={styles.passwordLabelDiv}>{ chrome.i18n.getMessage("password") }</div>
                     <Form.Control size="sm" type="password"
-                        placeholder="Enter password"
+                        placeholder={ chrome.i18n.getMessage("passwordInputPlaceholder") }
                         value={this.state.passwordInput}
                         onChange={this.handlePasswordInputChange}
                     />
                 </div>
 
                 <div className={styles.passwordDiv}>
-                    <div className={styles.passwordLabelDiv}>Confirm Password</div>
+                    <div className={styles.passwordLabelDiv}>{ chrome.i18n.getMessage("confirmPassword") }</div>
                     <Form.Control size="sm" type="password"
-                        placeholder="Confirm password"
+                        placeholder={ chrome.i18n.getMessage("confirmPasswordInputPlaceholder") }
                         value={this.state.passwordConfirmInput}
                         onChange={this.handlePasswordConfirmInputChange}
                     />
@@ -120,30 +121,37 @@ class SignUp extends React.Component {
                               !this.state.emailInputTouched || !this.state.passwordInputTouched ||
                               this.state.passwordInput !== this.state.passwordConfirmInput}
                     block={true} onClick={this.handleEmailSignUp}>
-                    <strong>Sign Up</strong>
+                    <strong>{ chrome.i18n.getMessage("signUp") }</strong>
                 </Button>
 
                 <div className={styles.signInDiv}>
-                    Already have an account?
+                    { chrome.i18n.getMessage("haveAccountQuestion") }
                     <span className={styles.signInSpan}
                         onClick={() => {this.props.authModeHandler('sign-in')}}>
-                        <strong>Sign in</strong>
+                        <strong>{ chrome.i18n.getMessage("signIn") }</strong>
                     </span>
                 </div>
 
-                <span className={authStyles.orSpan}>Or</span>
+                <span className={authStyles.orSpan}>{ chrome.i18n.getMessage("or") }</span>
 
                 <div className={authStyles.googleBtn} onClick={this.props.googleSignInHandler}>
                     <div className={authStyles.googleIconWrapper}>
                         <img class={authStyles.googleIcon} src={GoogleLogo} alt="google-logo"/>
                     </div>
-                    <p className={authStyles.btnText}><b>Continue with google</b></p>
+                    <p className={authStyles.btnText}><b>{ chrome.i18n.getMessage("continueWithGoogle") }</b></p>
                 </div>
 
                 <div className={styles.termsDiv}>
-                    By signing up, you agree to our 
-                    <a className={styles.termsLink} href="https://www.pagenow.io/privacy-policy" target="_blank" rel="noreferrer"> Privacy Policy</a> and 
-                    <a className={styles.termsLink} href="https://www.pagenow.io/terms-of-service" target="_blank" rel="noreferrer"> Terms of Service</a>.
+                    { chrome.i18n.getMessage("signUpAgreementBefore") }
+                    <a className={styles.termsLink} href="https://www.pagenow.io/privacy-policy"
+                       target="_blank" rel="noreferrer">
+                        { chrome.i18n.getMessage("privacyPolicy") }
+                    </a> { chrome.i18n.getMessage("and") }
+                    <a className={styles.termsLink} href="https://www.pagenow.io/terms-of-service"
+                       target="_blank" rel="noreferrer">
+                        { chrome.i18n.getMessage("termsOfService") }
+                    </a>
+                    { chrome.i18n.getMessage("signUpAgreementAfter") }.
                 </div>
 
                 <AuthFooter />

@@ -16,24 +16,24 @@
         "description": "Toggle button for stop sharing activity"
     },
     "toggleChatboxOn": {
-        "message": "Open Chatbox",
-        "description": "Toggle button for opening chatbox"
+        "message": "Open PageNow",
+        "description": "Toggle button for opening PageNow client"
     },
     "toggleChatboxOff": {
-        "message": "Close Chatbox",
-        "description": "Toggle button for closing chatbox"
+        "message": "Close PageNow",
+        "description": "Toggle button for closing PageNow client"
     },
     "toggleChatIconOn": {
-        "message": "Show Chat Icon",
-        "description": "Toggle button for showing chat icon"
+        "message": "Show PageNow Icon",
+        "description": "Toggle button for showing PageNow icon"
     },
     "toggleChatIconOff": {
-        "message": "Hide Chat Icon",
-        "description": "Toggle button for hiding chat icon"
+        "message": "Hide PageNow Icon",
+        "description": "Toggle button for hiding PageNow icon"
     },
     "chatIconLocation": {
         "message": "Bottom Right",
-        "description": "Location of chat icon on chrome window"
+        "description": "Location of PageNow icon on chrome window"
     },
     "refreshMessage": {
         "message": "Refresh the page if the client is missing or something is wrong.",
@@ -70,5 +70,145 @@
     "instagramWarningMessage": {
         "message": "Allowing instagram.com may result in sharing personal activities",
         "description": "Instagram domain sharing warning message"
+    },
+    "switchTabWarningMessage": {
+        "message": "Please Switch to a Different Tab to Sign In!",
+        "description": "Switch tab warning message"
+    },
+    "email": {
+        "message": "Email",
+        "description": "email"
+    },
+    "emailInputPlaceholder": {
+        "message": "Enter email",
+        "description": "Email input placeholder"
+    },
+    "password": {
+        "message": "Password",
+        "description": "password"
+    },
+    "passwordInputPlaceholder": {
+        "message": "Enter password",
+        "description": "Password input placeholder"
+    },
+    "newPassword": {
+        "message": "New Password",
+        "description": "New password"
+    },
+    "newPasswordInputPlaceholder": {
+        "message": "Enter new password",
+        "description": "New password input holder"
+    },
+    "confirmPassword": {
+        "message": "Confirm Password",
+        "description": "Confirm password"
+    },
+    "confirmPasswordInputPlaceholder": {
+        "message": "Enter password again",
+        "description": "Confirm password input placeholder"
+    },
+    "signUp": {
+        "message": "Sign Up",
+        "description": "Sign Up"
+    },
+    "signIn": {
+        "message": "Sign In",
+        "description": "Sign In"
+    },
+    "forgotPassword": {
+        "message": "Forgot password?",
+        "description": "Forgot password message"
+    },
+    "needAccountQuestion": {
+        "message": "Need an account?",
+        "description": "Need an account question message"
+    },
+    "haveAccountQuestion": {
+        "message": "Already have an account?",
+        "description": "Already have an account question message"
+    },
+    "continueWithGoogle": {
+        "message": "Continue with Google",
+        "description": "Google authentication button"
+    },
+    "signUpAgreementBefore": {
+        "message": "By signing up, you agree to our ",
+        "description": "Sign up agreement before links"
+    },
+    "signUpAgreementAfter": {
+        "message": "",
+        "description": "Sign up agreement after links"
+    },
+    "privacyPolicy": {
+        "message": "Privacy Policy",
+        "description": "Privacy policy"
+    },
+    "termsOfService": {
+        "message": "Terms of Service",
+        "description": "Terms of Service"
+    },
+    "or": {
+        "message": "Or",
+        "description": "Or"
+    },
+    "and": {
+        "message": "and ",
+        "description": "and"
+    },
+    "back": {
+        "message": "Back",
+        "description": "back"
+    },
+    "forgotPasswordHeader": {
+        "message": "Forgot Password",
+        "description": "Forgot Password page header"
+    },
+    "forgotPasswordInstruction": {
+        "message": "Enter your email and we will send you a verification code.",
+        "description": "Forgot password page instructions"
+    },
+    "sendVerificationCode": {
+        "message": "Send Verification Code",
+        "description": "Send verification code button"
+    },
+    "alreadyHaveVerificationCode": {
+        "message": "Already Have Verification Code",
+        "description": "Already have verification code button"
+    },
+    "emailValidationError": {
+        "message": "Email has invalid format.",
+        "description": "Email format error message"
+    },
+    "passwordMissingLowercaseError": {
+        "message": "Password must contain lowercase characters.",
+        "description": "Password missing lowercase error message"
+    },
+    "passwordMissingNumberError": {
+        "message": "Password must contain a number.",
+        "description": "Password missing number error message"
+    },
+    "passwordMissingSpecialCharacterError": {
+        "message": "Password must contain special characters.",
+        "description": "Password missing character error message"
+    },
+    "passwordLengthError": {
+        "message": "Password must be at least 8 characters.",
+        "description": "Password length error message"
+    },
+    "passwordMismatchError": {
+        "message": "The passwords do not match.",
+        "description": "Password mismatch error message"
+    },
+    "resetPassword": {
+        "message": "Reset Password",
+        "description": "Reset password page header"
+    },
+    "verificationCode": {
+        "message": "Verification Code",
+        "description": "Verification code"
+    },
+    "verificationCodeInputPlaceholder": {
+        "message": "Enter verification code",
+        "description": "Verification code input placeholder"
     }
 }
