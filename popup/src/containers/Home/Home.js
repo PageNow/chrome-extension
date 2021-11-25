@@ -24,6 +24,7 @@ class Home extends React.Component {
         onlineFriendCnt: null,
         recipientEmail: '',
         emailSentMsg: '',
+        emailSending: false,
         emailSentSuccess: false
     }
 
@@ -218,37 +219,43 @@ class Home extends React.Component {
     }
 
     sendInviteEmail = () => {
-        Auth.currentSession()
-            .then(session => {
-                const body = {
-                    senderFirstName: this.state.userInfo.first_name,
-                    senderLastName: this.state.userInfo.last_name,
-                    recipientEmail: this.state.recipientEmail
-                };
-                const options = {
-                    headers: { Authorization: session.getIdToken().getJwtToken() }
-                };
-                return axios.post(`${EMAIL_API_URL}/email`, body, options);
-            })
-            .then(res => {
-                this.setState({
-                    recipientEmail: '',
-                    emailSentMsg: 'Invitation is sent!',
-                    emailSentSuccess: true
+        this.setState({
+            emailSending: true
+        }, () => {
+            Auth.currentSession()
+                .then(session => {
+                    const body = {
+                        senderFirstName: this.state.userInfo.first_name,
+                        senderLastName: this.state.userInfo.last_name,
+                        recipientEmail: this.state.recipientEmail
+                    };
+                    const options = {
+                        headers: { Authorization: session.getIdToken().getJwtToken() }
+                    };
+                    return axios.post(`${EMAIL_API_URL}/email`, body, options);
+                })
+                .then(res => {
+                    this.setState({
+                        recipientEmail: '',
+                        emailSentMsg: chrome.i18n.getMessage("invitationSent"),
+                        emailSentSuccess: true,
+                        emailSending: false
+                    });
+                })
+                .catch(err => {
+                    this.setState({
+                        emailSentMsg: chrome.i18n.getMessage("internalServerError"),
+                        emailSentSuccess: false,
+                        emailSending: false
+                    });
                 });
-            })
-            .catch(err => {
-                this.setState({
-                    emailSentMsg: 'Sorry, something went wrong...',
-                    emailSentSuccess: false
-                });
-            });
+        });
     }
 
     render() {
         let currDomainDiv, shareToggleButtonSpan, shareToggleButtonDiv, chatIconToggleDiv, spinnerDiv;
         let isSharing, sharingDot, hidingDot; // display whether the domain is shared or not
-        let onlineFriendCntDiv, warningSpan;
+        let onlineFriendCntDiv, warningSpan, inviteButtonContent;
         spinnerDiv = (
             <div className={styles.spinnerDiv}>
                 <Spinner className={styles.spinner} animation="grow" variant="primary" size="sm" />
@@ -369,6 +376,16 @@ class Home extends React.Component {
                 </div>
             )
         }
+
+        if (this.state.emailSending) {
+            inviteButtonContent = (
+                <Spinner animation="border" size='sm' variant='info' />
+            );
+        } else {
+            inviteButtonContent = (
+                <span>{ chrome.i18n.getMessage("inviteButtonContent") }</span>
+            );
+        }
         
         return (
             <div className={styles.homeDiv}>
@@ -416,8 +433,8 @@ class Home extends React.Component {
                         value={this.state.recipientEmail}
                         onChange={this.handleRecipientEmailChange}    
                     />
-                    <Button variant="outline-secondary" onClick={this.sendInviteEmail}>
-                        { chrome.i18n.getMessage("inviteButtonContent") }
+                    <Button variant="outline-secondary" onClick={this.sendInviteEmail} disabled={this.state.emailSending}>
+                        { inviteButtonContent }
                     </Button>
                 </InputGroup>
                 <div className={this.state.emailSentSuccess ? styles.emailSentSuccessDiv : styles.emailSentFailureDiv}>

@@ -109,7 +109,7 @@
 }
   
 .toggleInputClosed:checked + .sliderHiding:before {
-    -webkit-transform: translateX(-15px);
-    -ms-transform: translateX(-15px);
-    transform: translateX(-15px);
+    -webkit-transform: translateX(15px);
+    -ms-transform: translateX(15px);
+    transform: translateX(15px);
 }

@@ -246,5 +246,9 @@
     "confirmAgeInput": {
         "message": "I confirm that I am 13 years or over",
         "description": "Confirm age input"
+    },
+    "invitationSent": {
+        "message": "Invitation is sent!",
+        "description": "Invitation sent message"
     }
 }

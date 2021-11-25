@@ -246,5 +246,9 @@
     "confirmAgeInput": {
         "message": "만 13세 이상임을 확인합니다.",
         "description": "나이 확인 입력"
+    },
+    "invitationSent": {
+        "message": "초대를 성공적으로 보냈습니다!",
+        "description": "초대 성공 메시지"
     }
 }
