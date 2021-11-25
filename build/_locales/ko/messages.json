@@ -210,5 +210,41 @@
     "verificationCodeInputPlaceholder": {
         "message": "인증 코드를 입력하세요",
         "description": "인증 코드 입력 박스 placeholder"
+    },
+    "submitUserInformation": {
+        "message": "사용자 정보 등록",
+        "description": "사용자 정보 등록 페이지 제목"
+    },
+    "name": {
+        "message": "이름 (미국식 표기)",
+        "description": "이름 레이블"
+    },
+    "firstName": {
+        "message": "이름",
+        "description": "이름"
+    },
+    "lastName": {
+        "message": "성",
+        "description": "성"
+    },
+    "saveUserInformation": {
+        "message": "저장하기",
+        "description": "사용자 정보 저장 버튼"
+    },
+    "internalServerError": {
+        "message": "오류가 발생하였습니다",
+        "description": "서버 오류 메시지"
+    },
+    "confirmAgeHeader": {
+        "message": "나이 확인",
+        "description": "나이 확인 제목"
+    },
+    "confirmAgeSubheader": {
+        "message": "PageNow의 사용자는 13세 이상이어야 합니다.",
+        "description": "나이 확인 부제목"
+    },
+    "confirmAgeInput": {
+        "message": "만 13세 이상임을 확인합니다.",
+        "description": "나이 확인 입력"
     }
 }

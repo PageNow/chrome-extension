@@ -210,5 +210,41 @@
     "verificationCodeInputPlaceholder": {
         "message": "Enter verification code",
         "description": "Verification code input placeholder"
+    },
+    "submitUserInformation": {
+        "message": "Submit User Information",
+        "description": "Submit user information page header"
+    },
+    "name": {
+        "message": "Name",
+        "description": "Name label"
+    },
+    "firstName": {
+        "message": "First Name",
+        "description": "First name label"
+    },
+    "lastName": {
+        "message": "Last Name",
+        "description": "Last name label"
+    },
+    "saveUserInformation": {
+        "message": "Save User Information",
+        "description": "Save user information button"
+    },
+    "internalServerError": {
+        "message": "Sorry, there is somethin wrong.",
+        "description": "Internal server error message"
+    },
+    "confirmAgeHeader": {
+        "message": "Confirm Your Age",
+        "description": "Confirm age header"
+    },
+    "confirmAgeSubheader": {
+        "message": "PageNow requires users to be 13 years old or over. Please confirm your age.",
+        "description": "Confirm age subheader"
+    },
+    "confirmAgeInput": {
+        "message": "I confirm that I am 13 years or over",
+        "description": "Confirm age input"
     }
 }

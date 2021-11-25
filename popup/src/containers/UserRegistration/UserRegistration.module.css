@@ -20,7 +20,7 @@
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
-    padding-bottom: 5px;
+    padding-bottom: 15px;
 }
 
 .nameInputLeft {
@@ -33,19 +33,21 @@
     margin-left: 3px;
 }
 
-.dobInputDiv {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding-bottom: 5px;
+.ageSubheaderDiv {
+    font-size: 14px;
+    margin-bottom: 5px;
 }
 
-.select {
-    width: 31%;
-    border: 1px solid #ced4da;
-    border-radius: .2rem;
-    font-size: 14px;
-    height: 25px;
+.ageInputDiv {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.ageVerificationInput {
+    margin-right: 7px;
 }
 
 .genderInputDiv {
