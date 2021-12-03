@@ -323,7 +323,10 @@ function connectPresenceWebsocket() {
                                 userId: data.userId,
                                 url: data.url,
                                 title: data.title,
-                                domain: data.domain
+                                domain: data.domain,
+                                latestUrl: data.latestUrl,
+                                latestTitle: data.latestTitle,
+                                latestDomain: data.latestDomain
                             };
                             chrome.tabs.query({}, function(tabs) {
                                 for (var i = 0; i < tabs.length; i++) {
@@ -546,11 +549,21 @@ function updateCurrDomain(url) {
     } catch {
         currDomain = '';
     }
-    // send the udpated domain and url to popup
+    // send the updated domain and url to popup
     chrome.runtime.sendMessage({
         type: 'update-domain',
         domain: currDomain,
         url: url
+    });
+    // send the isSharing information to chatIcon
+    chrome.tabs.query({}, function(tabs) {
+        for (var i = 0; i < tabs.length; i++) {
+            chrome.tabs.sendMessage(tabs[i].id, {
+                type: 'update-is-sharing',
+                isSharing: (shareMode == 'default_none' && domainAllowSet.has(currDomain)) ||
+                    (shareMode == 'default_all' && !domainDenySet.has(currDomain))
+            });
+        }
     });
 }
 

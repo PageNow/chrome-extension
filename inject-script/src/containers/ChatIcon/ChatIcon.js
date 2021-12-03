@@ -21,6 +21,7 @@ function ChatIcon () {
     const [ windowId, setWindowId ] = useState(-1);
     const [ showChatIcon, setShowChatIcon ] = useState(true);
     const [ notificationCnt, setNotificationCnt ] = useState(0);
+    const [ isSharing, setIsSharing ] = useState(false);
 
     useEffect(() => {
         if (windowId === -1) {
@@ -39,13 +40,18 @@ function ChatIcon () {
                 setNotificationCnt(item[notificationCntKey]);
             });
 
-            
             chrome.storage.onChanged.addListener((changes, namespace) => {
                 if (changes.hasOwnProperty(showChatIconKey)) {
                     setShowChatIcon(changes[showChatIconKey].newValue);
                 }
                 if (changes.hasOwnProperty(notificationCntKey)) {
                     setNotificationCnt(changes[notificationCntKey].newValue);
+                }
+            });
+
+            chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+                if (message.type === 'update-is-sharing') {
+                    setIsSharing(message.isSharing);
                 }
             });
         }
@@ -107,7 +113,7 @@ function ChatIcon () {
             <Draggable onStart={handleStart} onDrag={handleDrag} onStop={handleStop}>
                 <span className="pagenow-chat-icon-span">
                     <img alt='Chat Icon' draggable="false" style={{display: 'none'}}
-                         src={iconImg}
+                         src={iconImg} className={ isSharing ? '' : 'pagenow-chat-icon-image' }
                     />
                 </span>
             </Draggable>

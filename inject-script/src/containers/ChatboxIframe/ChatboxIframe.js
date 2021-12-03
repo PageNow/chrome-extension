@@ -124,7 +124,10 @@ if (chrome && chrome.extension) {
                         userId: message.userId,
                         url: message.url,
                         title: message.title,
-                        domain: message.domain
+                        domain: message.domain,
+                        latestUrl: message.latestUrl,
+                        latestTitle: message.latestTitle,
+                        latestDomain: message.latestDomain
                     }
                 });
                 break;
@@ -168,7 +171,6 @@ if (chrome && chrome.extension) {
                 });
                 break;
             default:
-                console.log('Message type ' + message.type + ' is unknown');
                 break;
         }
         sendResponse(null);
