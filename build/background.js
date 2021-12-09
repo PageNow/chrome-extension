@@ -1,20 +1,29 @@
 var presenceWsHost = 'wss://c36ut4t8oh.execute-api.us-west-2.amazonaws.com/prod/';
 var chatWsHost = 'wss://rlz53bbvnb.execute-api.us-west-2.amazonaws.com/prod/';
+var userApiHost = 'https://bmf1kkygkl.execute-api.us-west-2.amazonaws.com/prod/';
 
 var presenceWebsocket;
 var chatWebsocket;
 
 var windowChatboxOpen = {};
+
+// variables related to privacy setting
 var shareMode = 'default_none';
 var domainAllowSet = new Set([]);
 var domainDenySet = new Set([]);
+
+// user json web token
 var jwt;
 
 var currUrl;
 var currDomain;
 
-var notificationCnt = 0;
 var unreadConversationCnt = 0;
+
+// set of friendship requests (string {request_user_id}) that have not been accepted yet
+var friendRequestSet = new Set([]);
+// set of share notification events (string {event_id}) that have not been read yet
+var shareNotificationSet = new Set([]);
 
 connectPresenceWebsocket();
 connectChatWebsocket();
@@ -41,8 +50,8 @@ chrome.alarms.create(CHAT_HEARTBEAT, {
 // Poll notifications and unread messages every 3 minutes
 // to set extension badge text
 chrome.alarms.create(NOTIFICATION_POLL, {
-    delayInMinutes: 2,
-    periodInMinutes: 2
+    delayInMinutes: 1,
+    periodInMinutes: 1
 });
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
@@ -220,11 +229,35 @@ chrome.runtime.onMessageExternal.addListener(
                 readMessagesChatWebsocket(request.data);
                 sendResponse({ code: 'success' });
                 break;
-            // update the number of notifications
-            case 'update-notification-cnt':
-                notificationCnt = request.data.notificationCnt;
+            // remove the userId from friendRequestSet
+            case 'remove-friend-request':
+                friendRequestSet.delete(request.data.userId);
                 updateBadgeText();
                 sendResponse({ code: 'success' });
+                // update the friend request status for all tabs
+                chrome.tabs.query({}, function(tabs) {
+                    for (var i = 0; i < tabs.length; i++) {
+                        chrome.tabs.sendMessage(tabs[i].id, {
+                            type: 'remove-friend-request',
+                            userId: request.data.userId
+                        });
+                    }
+                });
+                break;
+            // read share notification
+            case 'read-share-notification':
+                shareNotificationSet.delete(request.data.eventId);
+                updateBadgeText();
+                sendResponse({ code: 'success' });
+                // update the share notification for all tabs
+                chrome.tabs.query({}, function(tabs) {
+                    for (var i = 0; i < tabs.length; i++) {
+                        chrome.tabs.sendMessage(tabs[i].id, {
+                            type: 'read-share-notification',
+                            eventId: request.data.eventId
+                        });
+                    }
+                });
                 break;
             // update the number of unread conversations
             case 'update-unread-conversation-cnt':
@@ -233,7 +266,6 @@ chrome.runtime.onMessageExternal.addListener(
                 sendResponse({ code: 'success' });
                 break;
             default:
-                console.log("Request type " + request.type + " not found");
                 break;
         }
     }
@@ -277,8 +309,9 @@ chrome.runtime.onMessage.addListener(
                         chrome.tabs.sendMessage(tabs[0].id, { type: 'auth-null' });
                     }        
                 });
-                notificationCnt = 0;
                 unreadConversationCnt = 0;
+                friendRequestSet = new Set([]);
+                shareNotificationSet = new Set([]);
                 break;
             case 'curr-domain':
                 sendResponse({ code: 'success', data: { currDomain: currDomain, currUrl: currUrl } });
@@ -571,9 +604,34 @@ function updateCurrDomain(url) {
  * Helper functions to update badge text depending on
  * notification count and unread conversation count
  */
-function updateNotificationCnt(cnt) {
-    if (cnt !== null && cnt !== undefined) {
-        notificationCnt = cnt;
+function updateFriendRequests(response) {
+    if (response && Array.isArray(response)) {
+        // if the number of friend requests change, send message to update notifications
+        if (response.length !== friendRequestSet.size) {
+            chrome.tabs.query({}, function(tabs) {
+                for (var i = 0; i < tabs.length; i++) {
+                    chrome.tabs.sendMessage(tabs[i].id, { type: 'update-friend-requests' });
+                }
+            });
+        }
+        friendRequestSet = new Set(response.map(function(x) {
+            return x.user_id;
+        }));
+    }
+}
+function updateShareNotifications(response) {
+    if (respone && Array.isArray(response)) {
+        // if the number of share notifications change, send message to update notifications
+        if (response.length !== shareNotificationSet.size) {
+            chrome.tabs.query({}, function(tabs) {
+                for (var i = 0; i < tabs.length; i++) {
+                    chrome.tabs.sendMessage(tabs[i].id, { type: 'update-share-notifications' })
+                }
+            });
+        }
+        shareNotificationSet = new Set(response.map(function(x) {
+            return x.event_id;
+        }));
     }
 }
 function updateUnreadConversationCnt(cnt) {
@@ -584,15 +642,42 @@ function updateUnreadConversationCnt(cnt) {
 
 function getFriendRequests() {
     if (jwt !== undefined && jwt !== null) {
-        var url = 'https://bmf1kkygkl.execute-api.us-west-2.amazonaws.com/prod/friendship/requests';
+        var url = userApiHost + 'friendship/requests';
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
         xhr.setRequestHeader('Authorization', 'Bearer ' + jwt);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
-                var resp = JSON.parse(xhr.responseText);
-                updateNotificationCnt(resp.length);
-                updateBadgeText();
+                try {
+                    var resp = JSON.parse(xhr.responseText);
+                    updateFriendRequests(resp);
+                    updateBadgeText();
+                } catch (error) {
+                    console.log(xhr.responseText);
+                    console.log(error);
+                }
+            }
+        }
+        xhr.send();
+    }
+}
+
+function getShareNotifications() {
+    if (jwt !== undefined && jwt !== null) {
+        var url = userApiHost + 'notifications/share?is_read=false';
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + jwt);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                try {
+                    var resp = JSON.parse(xhr.responseText);
+                    updateShareNotifications(resp);
+                    updateBadgeText();
+                } catch (error) {
+                    console.log(xhr.responseText);
+                    console.log(error);
+                }
             }
         }
         xhr.send();
@@ -607,9 +692,14 @@ function getUnreadMessages() {
         xhr.setRequestHeader('Authorization', jwt);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
-                var resp = JSON.parse(xhr.responseText);
-                updateUnreadConversationCnt(resp.length);
-                updateBadgeText();
+                try {
+                    var resp = JSON.parse(xhr.responseText);
+                    updateUnreadConversationCnt(resp.length);
+                    updateBadgeText();
+                } catch (error) {
+                    console.log(xhr.responseText);
+                    console.log(error);
+                }
             }
         }
         xhr.send();
@@ -619,8 +709,11 @@ function getUnreadMessages() {
 function updateBadgeText() {
     // update only if there is any notification or unreadConversationCnt 
     var badgeTextNumber = 0;
-    if (notificationCnt !== null && notificationCnt !== undefined) {
-        badgeTextNumber += notificationCnt;
+    if (friendRequestSet) {
+        badgeTextNumber += friendRequestSet.size;
+    }
+    if (shareNotificationSet) {
+        badgeTextNumber += shareNotificationSet.size;
     }
     if (unreadConversationCnt !== null && unreadConversationCnt !== undefined) {
         badgeTextNumber += unreadConversationCnt;

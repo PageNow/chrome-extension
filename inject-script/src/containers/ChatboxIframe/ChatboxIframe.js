@@ -161,6 +161,32 @@ if (chrome && chrome.extension) {
                     }
                 });
                 break;
+            case 'remove-friend-request':
+                sendMsgToIframe({
+                    type: 'remove-friend-request',
+                    data: {
+                        userId: message.userId
+                    }
+                });
+                break;
+            case 'update-friend-requests':
+                sendMsgToIframe({
+                    type: 'update-friend-requests'
+                });
+                break;
+            case 'read-share-notification':
+                sendMsgToIframe({
+                    type: 'read-share-notification',
+                    data: {
+                        eventId: message.eventId
+                    }
+                });
+                break;
+            case 'update-share-notifications':
+                sendMsgToIframe({
+                    type: 'update-share-notifications'
+                });
+                break;
             case 'update-domain-array':
                 sendMsgToIframe({
                     type: 'update-domain-array',
