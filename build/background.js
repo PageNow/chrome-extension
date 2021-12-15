@@ -72,12 +72,12 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
             }));
         }
     } else if (alarm.name === NOTIFICATION_POLL) {
-        // get number of notificaionts by sending message to
-        // content script and getting response
+        // get number of pending friend requests
         getFriendRequests();
-        // get number of unread messagges by sending message to
-        // content script and getting response
+        // get number of unread messages
         getUnreadMessages();
+        // get number of unread share notifications
+        getUnreadShareNotifications();
     }
 });
 
@@ -620,7 +620,7 @@ function updateFriendRequests(response) {
     }
 }
 function updateShareNotifications(response) {
-    if (respone && Array.isArray(response)) {
+    if (response && Array.isArray(response)) {
         // if the number of share notifications change, send message to update notifications
         if (response.length !== shareNotificationSet.size) {
             chrome.tabs.query({}, function(tabs) {
@@ -662,7 +662,7 @@ function getFriendRequests() {
     }
 }
 
-function getShareNotifications() {
+function getUnreadShareNotifications() {
     if (jwt !== undefined && jwt !== null) {
         var url = userApiHost + 'notifications/share?is_read=false';
         var xhr = new XMLHttpRequest();
