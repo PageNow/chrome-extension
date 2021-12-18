@@ -5,8 +5,6 @@ PageNow 크롬 웹스토어: https://chrome.google.com/webstore/detail/pagenow/l
 
 # PageNow 크롬 익스텐션
 
-## 레포지토리 목적
-
 PageNow 크롬 익스텐션 레포지토리입니다. [build](./build/)를 압축하여 크롬 웹 스토어에 패키지로 등록하면 크롬 웹 스토어에 퍼블리싱 됩니다.
 
 <p align="center">
