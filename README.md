@@ -5,8 +5,6 @@ PageNow Chrome Web Store: https://chrome.google.com/webstore/detail/pagenow/lplo
 
 # PageNow Chrome Extension
 
-## What is this repository for?
-
 This repository contains code for PageNow Chrome extension. The [build](./build/) directory is compressed and uploaded to the Chrome Web Store.
 
 <p align="center">
