@@ -1,21 +1,57 @@
-# PageNow chrome extension
+[한국어 README.md](./README_KO.md)
 
-Link to Chrome Web Store: https://chrome.google.com/webstore/detail/pagenow/lplobiaakhgkjcldopgkbcibeilddbmc
+# PageNow Chrome Extension
 
-This repository holds code for the Chrome extension. Chrome extension is composed of two components: popup and content script. Popup is the screen that pops up when you click the extension icon. Content script is the iframe injection to every website. [chat-client](https://github.com/PageNow/chat-client) is injected to the iframe.
+PageNow Home Page: https://pagenow.io <br/>
+PageNow Chrome Web Store: https://chrome.google.com/webstore/detail/pagenow/lplobiaakhgkjcldopgkbcibeilddbmc
+
+## What is this repository for?
+
+This repository contains code for the Chrome extension. The compressed file of the [build](./build/) directory is uploaded to the Chrome Web Store.
+
+<p align="center">
+<img src="./images/chrome_store_image.png" width = "500"/>
+</p>
 
 ## Overview
 
-Using javascript injection, we create iframe that hosts chatbox.
+A Chrome extension is composed of two components: popup and content script. Popup is the screen that pops up when you click the extension icon. Content script is the script that lives in each page opened on the Chrome browser. PageNow Chrome extension is also composed of two components (popup and inject-script) and the output directory (build).
 
-* `popup/` contains the code for popup.html
-* `inject-script/` contains the code that is injected by the chrome extension.
+* [popup/](./popup/) contains the code that runs when the extension popup is opened.
+* [inject-script](./inject-script) contains the code injected to each page (PageNow client and PageNow icon).
+* [build](./build/) is the output directory that holds the built code of popup and inject-script. It also has core files, such as [mainfest.json](./build/manifest.json) and [background.js](./build/background.js)
+
+## Local Configuration
+
+The following should be configured for local development.
+
+* `externally_connectable` in [build/manifest.json](./build/manifest.json) must include the localhost for the client running locally. It allows the Chrome extension to exchange messages between the injected client. For the default Angular app, it is `http://localhost:4200/*`.
+* `CLIENT_URL` in [inject-script/src/shared/config.js](./inject-script/src/shared/config.js) must be set to the localhost endpoint. It provides the source address to host in the injected iframe.
+* `CLIENT_URL` in [popup/src/shared/config.js](./popup/src/shared/config.js) must be set to the localhost endpoint to enable authentication flow.
+* `USER_API_URL` in [popup/src/shared/config.js](./popup/src/shared/config.js) must be set to the endpoint of the user API. For the default Fast API server, it is `http://localhost:8000`.
 
 ## Build
 
-Popup and injection scripts must be built into `build/` to be uploaded to Chrome.
+Popup and injection scripts must be built before compressing.
 
-Run ```npm run-script build``` inside `popup/` and `inject-script/` to build the extension.
+Here are the steps to generate the final output to be uploaded to the Chrome web store.
+1. Run ```npm run-script build``` inside [popup](./popup/) directory and [inject-script](./inject-script/) directory to build the extension.
+2. Compress the `build/` folder and upload to Chrome extension.
+
+## Chrome Web Store Deployment
+
+There are some configurations that need to be checked before publishing the package to the Chrome store.
+
+* Update `presenceWsHost` and `chatWsHost` to production endpoints in [build/background.js](./build/background.js).
+* Update `externally_connectable` in [build/manifest.json](./build/manifest.json) so that *matches* array only contains `<PRODUCTION_CLIENT_URL>/*`.
+* Update `CLIENT_URL` in `inject-script/src/shared/config.js`.
+* Update `USER_API_URL`, `CLIENT_URL` in `popup/src/shared/config.js`.
+
+After updating these configurations, follow the steps to build and upload the package via Chrome Web Store Developer Dashboard.
+
+<p align="center">
+<img src="./images/chrome_web_store_developer_dashboard.png" width = "600"/>
+</p>
 
 ## Notes
 
@@ -24,22 +60,3 @@ Run ```npm run-script build``` inside `popup/` and `inject-script/` to build the
 * Websocket (wss) doesn't accept headers, so we need to pass it as query param and verify at Lambda function level.
 
 * We get jwt using Amplify, but background.js does not use Amplify. Thus, we refresh jwt as frequently as possible to prevent jwt from being expired.
-
-## Chrome Store Upload
-
-* Update `presenceWsHost` and `chatWsHost` in `background.js`.
-* Update `externally_connectable` in `manifest.json`.
-* Update `CLIENT_URL` in `inject-script/src/shared/config.js`.
-* Update `USER_API_URL`, `CLIENT_URL` in `popup/src/shared/config.js`.
-
-## References
-
-### background.js websocket
-
-* https://github.com/fregante/GhostText/blob/main/source/background.js
-* https://medium.com/swlh/implementing-secure-web-sockets-with-aws-api-gateway-cognito-dynamodb-and-lambda-b38e02314b42
-* http://iostreamer.me/ws/node.js/jwt/2016/05/08/websockets_authentication.html
-
-### External monitor bug fix
-
-* https://stackoverflow.com/questions/56500742/why-is-my-google-chrome-extensions-popup-ui-laggy-on-external-monitors-but-not
